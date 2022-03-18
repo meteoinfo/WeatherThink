@@ -1,12 +1,10 @@
 package org.meteothink.weather.form;
 
-import bibliothek.gui.dock.ScreenDockStation;
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CGrid;
 import bibliothek.gui.dock.common.theme.ThemeMap;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.formdev.flatlaf.extras.FlatSVGUtils;
-import org.meteoinfo.chart.ChartPanel;
 import org.meteoinfo.data.meteodata.MeteoDataInfo;
 import org.meteothink.weather.Options;
 
@@ -100,8 +98,8 @@ public class FrmMain extends JFrame {
         System.out.println("Editor and Console panels...");
         CGrid grid = new CGrid(control);
 
-        configDockable = new ConfigDockable("Configure");
         figureDockable = new FigureDockable(this, this.startupPath, "Figure");
+        configDockable = new ConfigDockable(this, "Configure", this.startupPath);
         grid.add(0, 0, 3, 10, configDockable);
         grid.add(3, 0, 7, 10, figureDockable);
         control.getContentArea().deploy(grid);
@@ -233,7 +231,7 @@ public class FrmMain extends JFrame {
             System.setProperty("user.dir", files[0].getParent());
             this.meteoDataInfo = new MeteoDataInfo();
             meteoDataInfo.openNetCDFData(files[0].getAbsolutePath());
-            this.configDockable.setTitleText(files[0].getName());
+            this.configDockable.setMeteoDataInfo(meteoDataInfo);
         }
 
         this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -271,5 +269,21 @@ public class FrmMain extends JFrame {
      */
     public Options getOptions() {
         return this.options;
+    }
+
+    /**
+     * Get figure dockable
+     * @return Figure dockable
+     */
+    public FigureDockable getFigureDockable() {
+        return this.figureDockable;
+    }
+
+    /**
+     * Get config dockable
+     * @return Config dockble
+     */
+    public ConfigDockable getConfigDockable() {
+        return this.configDockable;
     }
 }

@@ -9,16 +9,19 @@ import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.action.CAction;
 import bibliothek.gui.dock.common.action.CButton;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
+import org.meteoinfo.chart.AspectType;
 import org.meteoinfo.chart.ChartPanel;
 import org.meteoinfo.chart.IChartPanel;
 import org.meteoinfo.chart.MouseMode;
 import org.meteoinfo.chart.jogl.GLChartPanel;
+import org.meteoinfo.chart.jogl.Plot3DGL;
 import org.meteoinfo.console.jython.PythonInteractiveInterpreter;
 import org.meteoinfo.ui.ButtonTabComponent;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -42,6 +45,15 @@ public class FigureDockable extends DefaultSingleCDockable {
         this.doubleBuffer = true;
         this.setTitleIcon(new FlatSVGIcon("org/meteothink/weather/icons/figure.svg"));
         chartPanel = new GLChartPanel();
+        Plot3DGL plot3DGL = new Plot3DGL();
+        plot3DGL.setAspectType(AspectType.XY_EQUAL);
+        plot3DGL.setClipPlane(false);
+        plot3DGL.setOrthographic(false);
+        plot3DGL.setBackground(Color.black);
+        plot3DGL.setDisplayXY(false);
+        plot3DGL.setDisplayZ(false);
+        plot3DGL.setDrawBoundingBox(true);
+        chartPanel.setPlot(plot3DGL);
         this.getContentPane().add(chartPanel);
         //this.setCloseable(false);
 
@@ -149,5 +161,20 @@ public class FigureDockable extends DefaultSingleCDockable {
     public void setDoubleBuffer(boolean doubleBuffer) {
         this.doubleBuffer = doubleBuffer;
         this.chartPanel.setDoubleBuffered(doubleBuffer);
+    }
+
+    /**
+     * Get plot 3D object
+     * @return Plot 3D object
+     */
+    public Plot3DGL getPlot() {
+        return this.chartPanel.getPlot();
+    }
+
+    /**
+     * Repaint
+     */
+    public void rePaint() {
+        this.chartPanel.repaint();
     }
 }

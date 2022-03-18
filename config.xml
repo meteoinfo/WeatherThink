@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="config.xml" Type="configurefile">
-  <Path OpenPath="D:\MyProgram\java\WeatherThink"/>
+  <Path OpenPath="D:\MyProgram\java\WeatherThink\data\sample"/>
   <Font>
     <TextFont FontName="YaHei Consolas Hybrid" FontSize="14"/>
     <LegendFont FontName="宋体" FontSize="12"/>
@@ -8,5 +8,5 @@
   <ScriptLanguage Language="Jython"/>
   <LookFeel LafDecorated="true" Name="FlatDarkLaf"/>
   <Figure DoubleBuffering="true"/>
-  <Startup MainFormLocation="2,11" MainFormSize="1492,839" ShowMeteoDataDlg="true"/>
+  <Startup MainFormLocation="1,9" MainFormSize="2332,1252" ShowMeteoDataDlg="true"/>
 </MeteoInfo>

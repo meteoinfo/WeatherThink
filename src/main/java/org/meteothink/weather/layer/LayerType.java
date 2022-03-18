@@ -1,4 +1,4 @@
-package org.meteothink.weather.form;
+package org.meteothink.weather.layer;
 
 public enum LayerType {
     MAP_IMAGE {
@@ -8,7 +8,7 @@ public enum LayerType {
     },
     MAP_VECTOR {
         public String getNameCN() {
-            return "地图界限";
+            return "地图矢量";
         }
     },
     SLICE {
@@ -26,7 +26,7 @@ public enum LayerType {
             return "等值面";
         }
     },
-    STREAM_LINE {
+    STREAMLINE {
         public String getNameCN() {
             return "流线";
         }
