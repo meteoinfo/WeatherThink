@@ -6,7 +6,7 @@ public class IsoSurfaceLayer extends PlotLayer {
      * Constructor
      */
     public IsoSurfaceLayer() {
-        this.configPanel = new IsoSurfacePanel();
+        this.configPanel = new IsoSurfacePanel(this);
     }
 
     @Override
@@ -16,6 +16,8 @@ public class IsoSurfaceLayer extends PlotLayer {
 
     @Override
     public void updateGraphic() {
-
+        if (this.graphic == null) {
+            this.graphic = this.configPanel.getGraphic();
+        }
     }
 }

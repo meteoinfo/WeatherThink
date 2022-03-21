@@ -2,6 +2,7 @@ package org.meteothink.weather.layer;
 
 import org.meteoinfo.data.meteodata.MeteoDataInfo;
 import org.meteoinfo.data.meteodata.Variable;
+import org.meteoinfo.geometry.graphic.Graphic;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -12,7 +13,9 @@ public class MapVectorPanel extends LayerPanel {
     /**
      * Constructor
      */
-    public MapVectorPanel() {
+    public MapVectorPanel(PlotLayer layer) {
+        super(layer);
+
         Border border = BorderFactory.createTitledBorder("地图矢量设置");
         this.setBorder(border);
     }
@@ -21,18 +24,19 @@ public class MapVectorPanel extends LayerPanel {
      * Constructor
      * @param meteoDataInfo Meteo data info
      */
-    public MapVectorPanel(MeteoDataInfo meteoDataInfo) {
-        super(meteoDataInfo);
+    public MapVectorPanel(PlotLayer layer, MeteoDataInfo meteoDataInfo) {
+        super(layer, meteoDataInfo);
 
         Border border = BorderFactory.createTitledBorder("地图矢量设置");
         this.setBorder(border);
     }
 
+    /**
+     * Get graphic
+     * @return The graphic
+     */
     @Override
-    public void setMeteoDataInfo(MeteoDataInfo dataInfo) {
-        super.setMeteoDataInfo(dataInfo);
-
-        List<Variable> variables3D = get3DVariables();
-
+    public Graphic getGraphic() {
+        return null;
     }
 }

@@ -6,7 +6,7 @@ public class VolumeLayer extends PlotLayer {
      * Constructor
      */
     public VolumeLayer() {
-        this.configPanel = new VolumePanel();
+        this.configPanel = new VolumePanel(this);
     }
 
     @Override

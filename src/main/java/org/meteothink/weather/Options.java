@@ -40,7 +40,8 @@ import java.util.Properties;
 public class Options {
     // <editor-fold desc="Variables">
 
-    private String _fileName;
+    private String fileName;
+    private String currentPath;
     private Font _textFont = new Font("Simsun", Font.PLAIN, 15);
     private Font _legendFont;
     private String _scriptLanguage = "Jython";
@@ -55,6 +56,23 @@ public class Options {
     
     // </editor-fold>
     // <editor-fold desc="Get Set Methods">
+
+    /**
+     * Get current path
+     * @return Current path
+     */
+    public String getCurrentPath() {
+        return this.currentPath;
+    }
+
+    /**
+     * Set current path
+     * @param value Current path
+     */
+    public void setCurrentPath(String value) {
+        this.currentPath = value;
+    }
+
     /**
      * Get text font
      *
@@ -88,7 +106,7 @@ public class Options {
      * @return File name
      */
     public String getFileName() {
-        return _fileName;
+        return fileName;
     }
 
     /**
@@ -243,8 +261,7 @@ public class Options {
         //Path
         Element path = doc.createElement("Path");
         Attr pAttr = doc.createAttribute("OpenPath");
-        String userPath = System.getProperty("user.dir");
-        pAttr.setValue(userPath);
+        pAttr.setValue(currentPath);
         path.setAttributeNode(pAttr);
         root.appendChild(path);
 
@@ -338,7 +355,7 @@ public class Options {
      * @throws IOException
      */
     public void loadConfigFile(String fileName) throws ParserConfigurationException, SAXException, IOException {
-        _fileName = fileName;
+        this.fileName = fileName;
 
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "UTF-8"));
         InputSource is = new InputSource(br);
@@ -350,9 +367,9 @@ public class Options {
         try {
             //Path
             Node path = root.getElementsByTagName("Path").item(0);
-            String currentPath = path.getAttributes().getNamedItem("OpenPath").getNodeValue();
-            if (new File(currentPath).isDirectory()) {
-                System.setProperty("user.dir", currentPath);
+            currentPath = path.getAttributes().getNamedItem("OpenPath").getNodeValue();
+            if (! new File(currentPath).isDirectory()) {
+                currentPath = System.getProperty("user.dir");
             }
 
             //Font

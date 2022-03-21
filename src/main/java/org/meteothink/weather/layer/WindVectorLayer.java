@@ -6,7 +6,7 @@ public class WindVectorLayer extends PlotLayer {
      * Constructor
      */
     public WindVectorLayer() {
-        this.configPanel = new WindVectorPanel();
+        this.configPanel = new WindVectorPanel(this);
     }
 
     @Override

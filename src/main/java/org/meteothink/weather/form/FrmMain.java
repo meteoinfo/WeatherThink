@@ -220,18 +220,19 @@ public class FrmMain extends JFrame {
     private void openFileActionPerformed(ActionEvent e) {
         this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-        String path = this.getStartupPath();
+        String path = this.options.getCurrentPath();
         File pathDir = new File(path);
 
         JFileChooser aDlg = new JFileChooser();
-        aDlg.setMultiSelectionEnabled(true);
+        aDlg.setMultiSelectionEnabled(false);
         aDlg.setCurrentDirectory(pathDir);
         if (JFileChooser.APPROVE_OPTION == aDlg.showOpenDialog(this)) {
-            File[] files = aDlg.getSelectedFiles();
-            System.setProperty("user.dir", files[0].getParent());
+            File file = aDlg.getSelectedFile();
+            this.options.setCurrentPath(file.getParent());
             this.meteoDataInfo = new MeteoDataInfo();
-            meteoDataInfo.openNetCDFData(files[0].getAbsolutePath());
-            this.configDockable.setMeteoDataInfo(meteoDataInfo);
+            meteoDataInfo.openNetCDFData(file.getAbsolutePath());
+            if (this.configDockable != null)
+                this.configDockable.setMeteoDataInfo(meteoDataInfo);
         }
 
         this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));

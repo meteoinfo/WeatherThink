@@ -6,7 +6,7 @@ public class SliceLayer extends PlotLayer {
      * Constructor
      */
     public SliceLayer() {
-        this.configPanel = new SlicePanel();
+        this.configPanel = new SlicePanel(this);
     }
 
     @Override

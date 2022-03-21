@@ -6,7 +6,7 @@ public class StreamlineLayer extends PlotLayer {
      * Constructor
      */
     public StreamlineLayer() {
-        this.configPanel = new StreamlinePanel();
+        this.configPanel = new StreamlinePanel(this);
     }
 
     @Override

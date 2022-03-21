@@ -2,6 +2,7 @@ package org.meteothink.weather.layer;
 
 import org.meteoinfo.data.meteodata.MeteoDataInfo;
 import org.meteoinfo.data.meteodata.Variable;
+import org.meteoinfo.geometry.graphic.Graphic;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -9,20 +10,26 @@ import java.util.List;
 
 public abstract class LayerPanel extends JPanel {
 
+    protected PlotLayer layer;
     protected MeteoDataInfo meteoDataInfo;
 
     /**
      * Constructor
+     *
+     * @param layer The plot layer
      */
-    public LayerPanel() {
-
+    public LayerPanel(PlotLayer layer) {
+        this.layer = layer;
     }
 
     /**
      * Constructor
+     *
+     * @param layer The plot layer
      * @param meteoDataInfo Meteo data info
      */
-    public LayerPanel(MeteoDataInfo meteoDataInfo) {
+    public LayerPanel(PlotLayer layer, MeteoDataInfo meteoDataInfo) {
+        this(layer);
         this.meteoDataInfo = meteoDataInfo;
     }
 
@@ -56,4 +63,9 @@ public abstract class LayerPanel extends JPanel {
         return variables;
     }
 
+    /**
+     * Get graphic
+     * @return Graphic
+     */
+    public abstract Graphic getGraphic();
 }

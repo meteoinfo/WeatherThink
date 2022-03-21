@@ -5,9 +5,10 @@ import bibliothek.gui.dock.common.action.CAction;
 import org.meteoinfo.chart.jogl.Plot3DGL;
 import org.meteoinfo.data.meteodata.MeteoDataInfo;
 import org.meteoinfo.geometry.graphic.Graphic;
-import org.meteoinfo.geometry.graphic.GraphicCollection;
 import org.meteoinfo.ui.CheckBoxListEntry;
 import org.meteoinfo.ui.JCheckBoxList;
+import org.meteothink.weather.event.GraphicChangedEvent;
+import org.meteothink.weather.event.GraphicChangedListener;
 import org.meteothink.weather.layer.LayerPanel;
 import org.meteothink.weather.layer.LayerType;
 import org.meteothink.weather.layer.PlotLayer;
@@ -19,6 +20,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,6 +63,12 @@ public class ConfigDockable extends DefaultSingleCDockable {
         DefaultListModel listModel = new DefaultListModel();
         for (LayerType layerType : LayerType.values()) {
             PlotLayer layer = PlotLayer.factory(layerType);
+            layer.addGraphicChangedListener(new GraphicChangedListener() {
+                @Override
+                public void graphicChangedEvent(GraphicChangedEvent e) {
+                    onLayerGraphicChanged(e);
+                }
+            });
             this.layers.add(layer);
             CheckBoxListEntry checkBoxListEntry = new CheckBoxListEntry(layer, false);
             checkBoxListEntry.addChangeListener(new ChangeListener() {
@@ -95,26 +103,43 @@ public class ConfigDockable extends DefaultSingleCDockable {
             this.configPanel.setMeteoDataInfo(this.meteoDataInfo);
         }
         this.getContentPane().add(this.configPanel, BorderLayout.CENTER);
-        this.parent.repaint();
+        this.configPanel.updateUI();
     }
 
     private void onLayerCheckChanged(ChangeEvent e) {
-        this.parent.setCursor(new Cursor(Cursor.WAIT_CURSOR));
         CheckBoxListEntry cb = (CheckBoxListEntry) e.getSource();
         PlotLayer layer = (PlotLayer) cb.getValue();
+        layer.setSelected(cb.isSelected());
         layer.updateGraphic();
         Graphic graphic = layer.getGraphic();
+        updateLayerGraphic(layer, graphic);
+    }
 
-        if (cb.isSelected()) {
+    private void onLayerGraphicChanged(GraphicChangedEvent e) {
+        PlotLayer layer = (PlotLayer) e.getSource();
+        Graphic graphic = e.getGraphic();
+        updateLayerGraphic(layer, graphic);
+    }
+
+    /**
+     * Update layer and graphic
+     * @param layer The layer
+     * @param graphic The graphic
+     */
+    public void updateLayerGraphic(PlotLayer layer, Graphic graphic) {
+        this.parent.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+        Graphic oldGraphic = layer.getGraphic();
+        if (oldGraphic != null) {
+            if (this.plot3DGL.getGraphics().contains(oldGraphic))
+                this.plot3DGL.getGraphics().remove(oldGraphic);
+        }
+        layer.setGraphic(graphic);
+        if (graphic != null && layer.isSelected()) {
             this.plot3DGL.addGraphic(graphic);
-            if (this.plot3DGL.getZMax() == this.plot3DGL.getZMax()) {
+            if (this.plot3DGL.getZMin() == this.plot3DGL.getZMax()) {
                 this.plot3DGL.setZMax(this.plot3DGL.getZMin() + 10);
             }
-        } else {
-            if (this.plot3DGL.getGraphics().contains(graphic))
-                this.plot3DGL.getGraphics().remove(graphic);
         }
-
         this.parent.getFigureDockable().rePaint();
         this.parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
@@ -125,6 +150,8 @@ public class ConfigDockable extends DefaultSingleCDockable {
      */
     public void setMeteoDataInfo(MeteoDataInfo meteoDataInfo) {
         this.meteoDataInfo = meteoDataInfo;
-        this.setTitleText(meteoDataInfo.getFileName());
+        this.setTitleText(new File(meteoDataInfo.getFileName()).getName());
+        this.configPanel.setMeteoDataInfo(meteoDataInfo);
+        this.configPanel.updateUI();
     }
 }

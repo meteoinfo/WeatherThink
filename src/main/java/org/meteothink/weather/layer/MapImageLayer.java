@@ -1,5 +1,6 @@
 package org.meteothink.weather.layer;
 
+import org.meteoinfo.chart.graphic.GraphicCollection3D;
 import org.meteoinfo.chart.jogl.JOGLUtil;
 import org.meteoinfo.geo.layer.ImageLayer;
 import org.meteoinfo.geo.mapdata.MapDataManage;
@@ -12,7 +13,7 @@ public class MapImageLayer extends PlotLayer {
      * Constructor
      */
     public MapImageLayer() {
-        this.configPanel = new MapImagePanel();
+        this.configPanel = new MapImagePanel(this);
     }
 
     @Override
@@ -33,6 +34,7 @@ public class MapImageLayer extends PlotLayer {
         try {
             ImageLayer layer = (ImageLayer) MapDataManage.loadLayer(fileName);
             this.graphic = JOGLUtil.createTexture(layer, 0, 0, null);
+            ((GraphicCollection3D)this.graphic).setUsingLight(false);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -1,10 +1,14 @@
 package org.meteothink.weather.layer;
 
 import org.meteoinfo.geometry.graphic.Graphic;
+import org.meteothink.weather.event.GraphicChangedEvent;
+import org.meteothink.weather.event.GraphicChangedListener;
 
-import javax.swing.JPanel;
+import javax.swing.event.EventListenerList;
 
 public abstract class PlotLayer {
+    private final EventListenerList listeners = new EventListenerList();
+    protected boolean selected = false;
     protected Graphic graphic;
     protected LayerPanel configPanel;
 
@@ -39,6 +43,39 @@ public abstract class PlotLayer {
             default:
                 throw new UnsupportedOperationException();
         }
+    }
+
+    public void addGraphicChangedListener(GraphicChangedListener listener) {
+        this.listeners.add(GraphicChangedListener.class, listener);
+    }
+
+    public void removeGraphicChangedListener(GraphicChangedListener listener) {
+        this.listeners.remove(GraphicChangedListener.class, listener);
+    }
+
+    public void fileGraphicChangedEvent(Graphic graphic) {
+        Object[] listeners = this.listeners.getListenerList();
+        for (int i = 0; i < listeners.length; i = i + 2) {
+            if (listeners[i] == GraphicChangedListener.class) {
+                ((GraphicChangedListener) listeners[i + 1]).graphicChangedEvent(new GraphicChangedEvent(this, graphic));
+            }
+        }
+    }
+
+    /**
+     * Get whether selected
+     * @return Whether selected
+     */
+    public boolean isSelected() {
+        return this.selected;
+    }
+
+    /**
+     * Set whether selected
+     * @param value Whether selected
+     */
+    public void setSelected(boolean value) {
+        this.selected = value;
     }
 
     /**
