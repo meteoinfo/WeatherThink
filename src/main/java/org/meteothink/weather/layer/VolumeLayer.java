@@ -16,6 +16,8 @@ public class VolumeLayer extends PlotLayer {
 
     @Override
     public void updateGraphic() {
-
+        if (this.graphic == null) {
+            this.graphic = this.configPanel.getGraphic();
+        }
     }
 }

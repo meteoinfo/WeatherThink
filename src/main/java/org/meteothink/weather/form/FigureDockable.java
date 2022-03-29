@@ -49,7 +49,7 @@ public class FigureDockable extends DefaultSingleCDockable {
         Plot3DGL plot3DGL = new Plot3DGL();
         //plot3DGL.setAspectType(AspectType.XY_EQUAL);
         plot3DGL.setClipPlane(false);
-        plot3DGL.setOrthographic(false);
+        //plot3DGL.setOrthographic(false);
         plot3DGL.setBackground(Color.black);
         plot3DGL.setDisplayXY(true);
         plot3DGL.setDisplayZ(true);
@@ -60,6 +60,7 @@ public class FigureDockable extends DefaultSingleCDockable {
         plot3DGL.setDrawBoundingBox(true);
         plot3DGL.getLighting().setEnable(true);
         chartPanel.setPlot(plot3DGL);
+        chartPanel.setZoomXY(true);
         this.getContentPane().add(chartPanel);
         //this.setCloseable(false);
 

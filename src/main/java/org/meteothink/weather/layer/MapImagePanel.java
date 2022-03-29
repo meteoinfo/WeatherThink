@@ -2,11 +2,15 @@ package org.meteothink.weather.layer;
 
 import org.meteoinfo.data.meteodata.MeteoDataInfo;
 import org.meteoinfo.geometry.graphic.Graphic;
+import org.meteothink.weather.data.Dataset;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 
 public class MapImagePanel extends LayerPanel {
+
+    JLabel jLabelImage;
+    JComboBox jComboBoxImage;
 
     /**
      * Constructor
@@ -17,19 +21,14 @@ public class MapImagePanel extends LayerPanel {
         this.setBorder(border);
     }
 
-    /**
-     * Constructor
-     * @param meteoDataInfo Meteo data info
-     */
-    public MapImagePanel(PlotLayer layer, MeteoDataInfo meteoDataInfo) {
-        super(layer, meteoDataInfo);
-
-        Border border = BorderFactory.createTitledBorder("地图图像设置");
-        this.setBorder(border);
+    private void initComponents() {
+        jLabelImage = new JLabel("图像文件:");
+        jComboBoxImage = new JComboBox();
+        
     }
 
     @Override
-    public void setMeteoDataInfo(MeteoDataInfo dataInfo) {
+    public void setDataset(Dataset dataset) {
 
     }
 

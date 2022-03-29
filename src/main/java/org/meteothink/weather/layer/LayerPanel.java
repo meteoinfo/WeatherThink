@@ -3,6 +3,7 @@ package org.meteothink.weather.layer;
 import org.meteoinfo.data.meteodata.MeteoDataInfo;
 import org.meteoinfo.data.meteodata.Variable;
 import org.meteoinfo.geometry.graphic.Graphic;
+import org.meteothink.weather.data.Dataset;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ import java.util.List;
 public abstract class LayerPanel extends JPanel {
 
     protected PlotLayer layer;
-    protected MeteoDataInfo meteoDataInfo;
+    protected Dataset dataset;
 
     /**
      * Constructor
@@ -26,24 +27,24 @@ public abstract class LayerPanel extends JPanel {
      * Constructor
      *
      * @param layer The plot layer
-     * @param meteoDataInfo Meteo data info
+     * @param dataset Dataset
      */
-    public LayerPanel(PlotLayer layer, MeteoDataInfo meteoDataInfo) {
+    public LayerPanel(PlotLayer layer, Dataset dataset) {
         this(layer);
-        this.meteoDataInfo = meteoDataInfo;
+        this.dataset = dataset;
     }
 
     /**
-     * Set meteo data info
-     * @param dataInfo Meteo data info
+     * Set dataset
+     * @param dataset Dataset
      */
-    public void setMeteoDataInfo(MeteoDataInfo dataInfo) {
-        if (this.meteoDataInfo != null) {
-            if (this.meteoDataInfo.getFileName() == dataInfo.getFileName()) {
+    public void setDataset(Dataset dataset) {
+        if (this.dataset != null) {
+            if (this.dataset.getFileName() == dataset.getFileName()) {
                 return;
             }
         }
-        this.meteoDataInfo = dataInfo;
+        this.dataset = dataset;
     };
 
     /**
@@ -53,7 +54,7 @@ public abstract class LayerPanel extends JPanel {
      */
     public List<Variable> get3DVariables() {
         List<Variable> variables = new ArrayList<>();
-        for (Variable variable : this.meteoDataInfo.getDataInfo().getVariables()) {
+        for (Variable variable : this.dataset.getVariables()) {
             if (variable.getXDimension() != null && variable.getYDimension() != null &&
                 variable.getZDimension() != null) {
                 variables.add(variable);

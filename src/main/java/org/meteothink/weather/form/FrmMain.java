@@ -7,6 +7,7 @@ import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.formdev.flatlaf.extras.FlatSVGUtils;
 import org.meteoinfo.data.meteodata.MeteoDataInfo;
 import org.meteothink.weather.Options;
+import org.meteothink.weather.data.Dataset;
 
 import javax.swing.*;
 import javax.xml.parsers.ParserConfigurationException;
@@ -45,8 +46,6 @@ public class FrmMain extends JFrame {
 
     private String startupPath;
     private Options options;
-
-    protected MeteoDataInfo meteoDataInfo;
 
     /**
      * Constructor
@@ -98,7 +97,7 @@ public class FrmMain extends JFrame {
         System.out.println("Editor and Console panels...");
         CGrid grid = new CGrid(control);
 
-        figureDockable = new FigureDockable(this, this.startupPath, "Figure");
+        figureDockable = new FigureDockable(this, this.startupPath, "图形");
         configDockable = new ConfigDockable(this, "Configure", this.startupPath);
         grid.add(0, 0, 3, 10, configDockable);
         grid.add(3, 0, 7, 10, figureDockable);
@@ -218,24 +217,24 @@ public class FrmMain extends JFrame {
     }
 
     private void openFileActionPerformed(ActionEvent e) {
-        this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-
         String path = this.options.getCurrentPath();
         File pathDir = new File(path);
-
         JFileChooser aDlg = new JFileChooser();
         aDlg.setMultiSelectionEnabled(false);
         aDlg.setCurrentDirectory(pathDir);
         if (JFileChooser.APPROVE_OPTION == aDlg.showOpenDialog(this)) {
+            this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             File file = aDlg.getSelectedFile();
             this.options.setCurrentPath(file.getParent());
-            this.meteoDataInfo = new MeteoDataInfo();
+            MeteoDataInfo meteoDataInfo = new MeteoDataInfo();
             meteoDataInfo.openNetCDFData(file.getAbsolutePath());
+            Dataset dataset = new Dataset(meteoDataInfo);
+            this.figureDockable.getPlot().setDrawExtent(dataset.getExtent3D());
+            this.figureDockable.getPlot().setFixExtent(true);
             if (this.configDockable != null)
-                this.configDockable.setMeteoDataInfo(meteoDataInfo);
+                this.configDockable.setDataset(dataset);
+            this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
         }
-
-        this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     }
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {

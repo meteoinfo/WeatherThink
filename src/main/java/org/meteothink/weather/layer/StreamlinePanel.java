@@ -2,6 +2,7 @@ package org.meteothink.weather.layer;
 
 import org.meteoinfo.data.meteodata.MeteoDataInfo;
 import org.meteoinfo.geometry.graphic.Graphic;
+import org.meteothink.weather.data.Dataset;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -16,21 +17,16 @@ public class StreamlinePanel extends LayerPanel {
 
         Border border = BorderFactory.createTitledBorder("流线设置");
         this.setBorder(border);
+
+        initComponents();
     }
 
-    /**
-     * Constructor
-     * @param meteoDataInfo Meteo data info
-     */
-    public StreamlinePanel(PlotLayer layer, MeteoDataInfo meteoDataInfo) {
-        super(layer, meteoDataInfo);
+    private void initComponents() {
 
-        Border border = BorderFactory.createTitledBorder("流线设置");
-        this.setBorder(border);
     }
 
     @Override
-    public void setMeteoDataInfo(MeteoDataInfo dataInfo) {
+    public void setDataset(Dataset dataset) {
 
     }
 

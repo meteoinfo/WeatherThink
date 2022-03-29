@@ -42,10 +42,6 @@ public class Options {
 
     private String fileName;
     private String currentPath;
-    private Font _textFont = new Font("Simsun", Font.PLAIN, 15);
-    private Font _legendFont;
-    private String _scriptLanguage = "Jython";
-    private boolean showStartMeteoDataDlg = true;
     private Point mainFormLocation = new Point(0, 0);
     private Dimension mainFormSize = new Dimension(1000, 650);
     private String lookFeel = "Nimbus";
@@ -74,33 +70,6 @@ public class Options {
     }
 
     /**
-     * Get text font
-     *
-     * @return Text Font
-     */
-    public Font getTextFont() {
-        return _textFont;
-    }
-
-    /**
-     * Set text font
-     *
-     * @param font Text font
-     */
-    public void setTextFont(Font font) {
-        _textFont = font;
-    }
-
-    /**
-     * Get legend text font
-     *
-     * @return Legend Text Font
-     */
-    public Font getLegendFont() {
-        return _legendFont;
-    }
-
-    /**
      * Get file name
      *
      * @return File name
@@ -109,49 +78,6 @@ public class Options {
         return fileName;
     }
 
-    /**
-     * Set legend text font
-     *
-     * @param font Legend text font
-     */
-    public void setLegendFont(Font font) {
-        _legendFont = font;
-    }
-    
-    /**
-     * Get script language name - Groovy or Jython
-     *
-     * @return Script language name
-     */
-    public String getScriptLanguage() {
-        return this._scriptLanguage;        
-    }
-
-    /**
-     * Set script language name - Groovy or Jython
-     *
-     * @param value Script language name
-     */
-    public void setScriptLanguage(String value) {
-        this._scriptLanguage = value;
-    }
-    
-    /**
-     * Get if show start meteo data dialog
-     * @return Boolean
-     */
-    public boolean isShowStartMeteoDataDlg(){
-        return this.showStartMeteoDataDlg;
-    }
-    
-    /**
-     * Set if show start meteo data dialog
-     * @param value Boolean
-     */
-    public void setShowStartMeteoDataDlg(boolean value){
-        this.showStartMeteoDataDlg = value;
-    }
-    
     /**
      * Get main form location
      * @return Main form location
@@ -265,33 +191,6 @@ public class Options {
         path.setAttributeNode(pAttr);
         root.appendChild(path);
 
-        //Font
-        Element font = doc.createElement("Font");
-        Element textFont = doc.createElement("TextFont");
-        Attr nameAttr = doc.createAttribute("FontName");
-        Attr sizeAttr = doc.createAttribute("FontSize");
-        nameAttr.setValue(_textFont.getFontName());
-        sizeAttr.setValue(String.valueOf(_textFont.getSize()));
-        textFont.setAttributeNode(nameAttr);
-        textFont.setAttributeNode(sizeAttr);
-        font.appendChild(textFont);
-        Element legendFont = doc.createElement("LegendFont");
-        nameAttr = doc.createAttribute("FontName");
-        sizeAttr = doc.createAttribute("FontSize");
-        nameAttr.setValue(_legendFont.getFontName());
-        sizeAttr.setValue(String.valueOf(_legendFont.getSize()));
-        legendFont.setAttributeNode(nameAttr);
-        legendFont.setAttributeNode(sizeAttr);
-        font.appendChild(legendFont);
-        root.appendChild(font);
-        
-        //Script language
-        Element scriptlang = doc.createElement("ScriptLanguage");
-        Attr slAttr = doc.createAttribute("Language");
-        slAttr.setValue(this._scriptLanguage);
-        scriptlang.setAttributeNode(slAttr);
-        root.appendChild(scriptlang);
-
         //Look and feel
         Element lf = doc.createElement("LookFeel");
         Attr lfAttr = doc.createAttribute("Name");
@@ -311,15 +210,12 @@ public class Options {
         
         //Start up form setting
         Element startForm = doc.createElement("Startup");
-        Attr meteoDlgAttr = doc.createAttribute("ShowMeteoDataDlg");
         Attr mfLocationAttr = doc.createAttribute("MainFormLocation");
         Attr mfSizeAttr = doc.createAttribute("MainFormSize");
-        meteoDlgAttr.setValue(String.valueOf(this.showStartMeteoDataDlg));
         mfLocationAttr.setValue(String.valueOf(this.mainFormLocation.x) + "," +
                 String.valueOf(this.mainFormLocation.y));
         mfSizeAttr.setValue(String.valueOf(this.mainFormSize.width) + "," +
                 String.valueOf(this.mainFormSize.height));
-        startForm.setAttributeNode(meteoDlgAttr);
         startForm.setAttributeNode(mfLocationAttr);
         startForm.setAttributeNode(mfSizeAttr);
         root.appendChild(startForm);
@@ -372,22 +268,6 @@ public class Options {
                 currentPath = System.getProperty("user.dir");
             }
 
-            //Font
-            Element font = (Element) root.getElementsByTagName("Font").item(0);
-            Node textFont = font.getElementsByTagName("TextFont").item(0);
-            String fontName = textFont.getAttributes().getNamedItem("FontName").getNodeValue();
-            float fontSize = Float.parseFloat(textFont.getAttributes().getNamedItem("FontSize").getNodeValue());
-            this._textFont = new Font(fontName, Font.PLAIN, (int) fontSize);
-
-            Node legendFont = font.getElementsByTagName("LegendFont").item(0);
-            fontName = legendFont.getAttributes().getNamedItem("FontName").getNodeValue();
-            fontSize = Float.parseFloat(legendFont.getAttributes().getNamedItem("FontSize").getNodeValue());
-            this._legendFont = new Font(fontName, Font.PLAIN, (int) fontSize);
-            
-            //Script language
-            Node scriptlang = root.getElementsByTagName("ScriptLanguage").item(0);
-            this._scriptLanguage = scriptlang.getAttributes().getNamedItem("Language").getNodeValue();
-
             //Look and feel
             if (root.getElementsByTagName("LookFeel") != null) {
                 Element lf = (Element) root.getElementsByTagName("LookFeel").item(0);
@@ -403,7 +283,6 @@ public class Options {
             
             //Start up form setting
             Node startForm = root.getElementsByTagName("Startup").item(0);
-            this.showStartMeteoDataDlg = Boolean.parseBoolean(startForm.getAttributes().getNamedItem("ShowMeteoDataDlg").getNodeValue());
             String loc = startForm.getAttributes().getNamedItem("MainFormLocation").getNodeValue();
             this.mainFormLocation.x = Integer.parseInt(loc.split(",")[0]);
             this.mainFormLocation.y = Integer.parseInt(loc.split(",")[1]);            

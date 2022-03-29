@@ -21,17 +21,6 @@ public class MapVectorPanel extends LayerPanel {
     }
 
     /**
-     * Constructor
-     * @param meteoDataInfo Meteo data info
-     */
-    public MapVectorPanel(PlotLayer layer, MeteoDataInfo meteoDataInfo) {
-        super(layer, meteoDataInfo);
-
-        Border border = BorderFactory.createTitledBorder("地图矢量设置");
-        this.setBorder(border);
-    }
-
-    /**
      * Get graphic
      * @return The graphic
      */

@@ -3,12 +3,14 @@ package org.meteothink.weather.layer;
 import org.meteoinfo.chart.jogl.JOGLUtil;
 import org.meteoinfo.data.meteodata.MeteoDataInfo;
 import org.meteoinfo.data.meteodata.Variable;
+import org.meteoinfo.geo.layout.LayoutGraphic;
 import org.meteoinfo.geometry.graphic.Graphic;
 import org.meteoinfo.geometry.graphic.GraphicCollection;
 import org.meteoinfo.geometry.legend.PolygonBreak;
 import org.meteoinfo.ndarray.Array;
 import org.meteoinfo.ndarray.InvalidRangeException;
 import org.meteoinfo.ndarray.math.ArrayMath;
+import org.meteothink.weather.data.Dataset;
 import org.meteothink.weather.util.DataUtil;
 
 import javax.swing.*;
@@ -44,26 +46,10 @@ public class IsoSurfacePanel extends LayerPanel {
         initComponents();
     }
 
-    /**
-     * Constructor
-     */
-    public IsoSurfacePanel(PlotLayer layer, MeteoDataInfo meteoDataInfo) {
-        super(layer, meteoDataInfo);
-
-        Border border = BorderFactory.createTitledBorder("等值面设置");
-        this.setBorder(border);
-
-        initComponents();
-
-        this.setMeteoDataInfo(meteoDataInfo);
-    }
-
     private void initComponents() {
         //Variable
         this.jLabelVariable = new JLabel("变量:");
         this.jComboBoxVariable = new JComboBox();
-        this.add(jLabelVariable);
-        this.add(jComboBoxVariable);
         jComboBoxVariable.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -92,8 +78,6 @@ public class IsoSurfacePanel extends LayerPanel {
 
             }
         });
-        this.add(jLabelValue);
-        this.add(jTextFieldValue);
 
         //Color
         jLabelColor = new JLabel("颜色:");
@@ -127,18 +111,43 @@ public class IsoSurfacePanel extends LayerPanel {
 
             }
         });
-        this.add(jLabelColor);
-        this.add(jLabelColorView);
+
+        //Set layout
+        GroupLayout layout = new GroupLayout(this);
+        this.setLayout(layout);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        layout.setHorizontalGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(jLabelVariable)
+                        .addComponent(jLabelValue)
+                        .addComponent(jLabelColor))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(jComboBoxVariable)
+                        .addComponent(jTextFieldValue)
+                        .addComponent(jLabelColorView, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+        );
+        layout.setVerticalGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabelVariable)
+                        .addComponent(jComboBoxVariable))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabelValue)
+                        .addComponent(jTextFieldValue))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabelColor)
+                        .addComponent(jLabelColorView, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+        );
     }
 
     @Override
-    public void setMeteoDataInfo(MeteoDataInfo dataInfo) {
-        if (this.meteoDataInfo != null) {
-            if (this.meteoDataInfo.getFileName() == dataInfo.getFileName()) {
+    public void setDataset(Dataset dataset) {
+        if (this.dataset != null) {
+            if (this.dataset.getFileName() == dataset.getFileName()) {
                 return;
             }
         }
-        this.meteoDataInfo = dataInfo;
+        this.dataset = dataset;
 
         List<Variable> variables3D = get3DVariables();
         this.jComboBoxVariable.removeAllItems();
@@ -150,7 +159,7 @@ public class IsoSurfacePanel extends LayerPanel {
         }
 
         try {
-            Array arr3d = DataUtil.read3DArray(dataInfo, (String) this.jComboBoxVariable.getSelectedItem(), 0);
+            Array arr3d = this.dataset.read3DArray((String) this.jComboBoxVariable.getSelectedItem(), 0);
             float mean = (float)ArrayMath.mean(arr3d);
             this.jTextFieldValue.setText(String.valueOf(mean));
         } catch (InvalidRangeException e) {
@@ -168,7 +177,7 @@ public class IsoSurfacePanel extends LayerPanel {
     }
 
     private Graphic createGraphic() {
-        if (this.meteoDataInfo == null) {
+        if (this.dataset == null) {
             return null;
         }
 
@@ -180,22 +189,22 @@ public class IsoSurfacePanel extends LayerPanel {
 
         if (data == null) {
             try {
-                data = DataUtil.read3DArray(meteoDataInfo, varName, 0);
+                data = this.dataset.read3DArray(varName, 0);
             } catch (InvalidRangeException e) {
                 e.printStackTrace();
             }
         }
-        Array[] xyz = DataUtil.readXYZArray(meteoDataInfo);
-        GraphicCollection graphic = JOGLUtil.isosurface(data, xyz[0], xyz[1], xyz[2], value, pb, 4);
+        GraphicCollection graphic = JOGLUtil.isosurface(data, dataset.getXArray(), dataset.getYArray(),
+                dataset.getZArray(), value, pb, 4);
         return graphic;
     }
 
     private void onVariableChanged(ItemEvent e) {
         if(e.getStateChange() == ItemEvent.SELECTED) {
-            if (this.meteoDataInfo != null) {
+            if (this.dataset != null) {
                 try {
-                    Array arr3d = DataUtil.read3DArray(this.meteoDataInfo, (String) this.jComboBoxVariable.getSelectedItem(), 0);
-                    float mean = (float) ArrayMath.mean(arr3d);
+                    data = this.dataset.read3DArray((String) this.jComboBoxVariable.getSelectedItem(), 0);
+                    float mean = (float) ArrayMath.mean(data);
                     this.jTextFieldValue.setText(String.valueOf(mean));
                 } catch (InvalidRangeException ex) {
                     ex.printStackTrace();

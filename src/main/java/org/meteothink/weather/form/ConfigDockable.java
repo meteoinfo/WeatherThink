@@ -7,6 +7,7 @@ import org.meteoinfo.data.meteodata.MeteoDataInfo;
 import org.meteoinfo.geometry.graphic.Graphic;
 import org.meteoinfo.ui.CheckBoxListEntry;
 import org.meteoinfo.ui.JCheckBoxList;
+import org.meteothink.weather.data.Dataset;
 import org.meteothink.weather.event.GraphicChangedEvent;
 import org.meteothink.weather.event.GraphicChangedListener;
 import org.meteothink.weather.layer.LayerPanel;
@@ -37,7 +38,7 @@ public class ConfigDockable extends DefaultSingleCDockable {
 
     private List<PlotLayer> layers = new ArrayList<>();
 
-    private MeteoDataInfo meteoDataInfo;
+    private Dataset dataset;
 
     public ConfigDockable(String s, CAction... cActions) {
         super(s, cActions);
@@ -99,8 +100,8 @@ public class ConfigDockable extends DefaultSingleCDockable {
             this.getContentPane().remove(this.configPanel);
         }
         this.configPanel = layer.getConfigPanel();
-        if (this.meteoDataInfo != null) {
-            this.configPanel.setMeteoDataInfo(this.meteoDataInfo);
+        if (this.dataset != null) {
+            this.configPanel.setDataset(this.dataset);
         }
         this.getContentPane().add(this.configPanel, BorderLayout.CENTER);
         this.configPanel.updateUI();
@@ -130,8 +131,7 @@ public class ConfigDockable extends DefaultSingleCDockable {
         this.parent.setCursor(new Cursor(Cursor.WAIT_CURSOR));
         Graphic oldGraphic = layer.getGraphic();
         if (oldGraphic != null) {
-            if (this.plot3DGL.getGraphics().contains(oldGraphic))
-                this.plot3DGL.getGraphics().remove(oldGraphic);
+            this.plot3DGL.removeGraphic(oldGraphic);
         }
         layer.setGraphic(graphic);
         if (graphic != null && layer.isSelected()) {
@@ -145,13 +145,15 @@ public class ConfigDockable extends DefaultSingleCDockable {
     }
 
     /**
-     * Set meteo data info
-     * @param meteoDataInfo Meteo data info
+     * Set dataset
+     * @param dataset Dataset
      */
-    public void setMeteoDataInfo(MeteoDataInfo meteoDataInfo) {
-        this.meteoDataInfo = meteoDataInfo;
-        this.setTitleText(new File(meteoDataInfo.getFileName()).getName());
-        this.configPanel.setMeteoDataInfo(meteoDataInfo);
-        this.configPanel.updateUI();
+    public void setDataset(Dataset dataset) {
+        this.dataset = dataset;
+        this.setTitleText(new File(dataset.getDataInfo().getFileName()).getName());
+        if (this.configPanel != null) {
+            this.configPanel.setDataset(dataset);
+            this.configPanel.updateUI();
+        }
     }
 }

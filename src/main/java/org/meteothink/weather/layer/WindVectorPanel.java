@@ -2,6 +2,7 @@ package org.meteothink.weather.layer;
 
 import org.meteoinfo.data.meteodata.MeteoDataInfo;
 import org.meteoinfo.geometry.graphic.Graphic;
+import org.meteothink.weather.data.Dataset;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -18,21 +19,9 @@ public class WindVectorPanel extends LayerPanel {
         this.setBorder(border);
     }
 
-    /**
-     * Constructor
-     * @param meteoDataInfo Meteo data info
-     */
-    public WindVectorPanel(PlotLayer layer, MeteoDataInfo meteoDataInfo) {
-        super(layer, meteoDataInfo);
-
-        Border border = BorderFactory.createTitledBorder("流场矢量设置");
-        this.setBorder(border);
-    }
-
     @Override
-    public void setMeteoDataInfo(MeteoDataInfo dataInfo) {
-        this.meteoDataInfo = dataInfo;
-        this.meteoDataInfo.getDataInfo().getVariables();
+    public void setDataset(Dataset dataset) {
+
     }
 
     /**
