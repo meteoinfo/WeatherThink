@@ -221,7 +221,8 @@ public class FrmMain extends JFrame {
         File pathDir = new File(path);
         JFileChooser aDlg = new JFileChooser();
         aDlg.setMultiSelectionEnabled(false);
-        aDlg.setCurrentDirectory(pathDir);
+        if (pathDir.isDirectory())
+            aDlg.setCurrentDirectory(pathDir);
         if (JFileChooser.APPROVE_OPTION == aDlg.showOpenDialog(this)) {
             this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             File file = aDlg.getSelectedFile();
@@ -229,6 +230,7 @@ public class FrmMain extends JFrame {
             MeteoDataInfo meteoDataInfo = new MeteoDataInfo();
             meteoDataInfo.openNetCDFData(file.getAbsolutePath());
             Dataset dataset = new Dataset(meteoDataInfo);
+            this.figureDockable.getPlot().setExtent(dataset.getExtent3D());
             this.figureDockable.getPlot().setDrawExtent(dataset.getExtent3D());
             this.figureDockable.getPlot().setFixExtent(true);
             if (this.configDockable != null)

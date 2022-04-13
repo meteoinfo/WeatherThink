@@ -60,22 +60,12 @@ public class IsoSurfacePanel extends LayerPanel {
         //Value
         this.jLabelValue = new JLabel("等值面值:");
         this.jTextFieldValue = new JTextField(10);
-        jTextFieldValue.addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-
-            }
-
+        jTextFieldValue.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 if(e.getKeyChar() == KeyEvent.VK_ENTER) {
                     onValueChanged();
                 }
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-
             }
         });
 
@@ -85,30 +75,10 @@ public class IsoSurfacePanel extends LayerPanel {
         jLabelColorView.setOpaque(true);
         jLabelColorView.setBackground(Color.white);
         jLabelColorView.setPreferredSize(new Dimension(50, 20));
-        jLabelColorView.addMouseListener(new MouseListener() {
+        jLabelColorView.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 onColorActionPerformed(e);
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-
             }
         });
 

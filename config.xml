@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="config.xml" Type="configurefile">
-  <Path OpenPath="D:\MyProgram\java\WeatherThink\data\sample"/>
+  <Path OpenPath="D:\Temp\LaSW"/>
   <LookFeel LafDecorated="true" Name="FlatDarkLaf"/>
   <Figure DoubleBuffering="true"/>
-  <Startup MainFormLocation="-7,0" MainFormSize="1310,728"/>
+  <Startup MainFormLocation="-7,-7" MainFormSize="1293,685"/>
 </MeteoInfo>

@@ -31,6 +31,7 @@ public class ConfigDockable extends DefaultSingleCDockable {
     private JScrollPane jScrollPaneLayers;
     private JCheckBoxList jCheckBoxListLayers;
     private LayerPanel configPanel;
+    private JScrollPane jScrollPaneConfig;
 
     private FrmMain parent;
     private Plot3DGL plot3DGL;
@@ -91,6 +92,8 @@ public class ConfigDockable extends DefaultSingleCDockable {
         jScrollPaneLayers.setBorder(border);
         jScrollPaneLayers.setViewportView(jCheckBoxListLayers);
         this.getContentPane().add(jScrollPaneLayers, BorderLayout.NORTH);
+
+        this.jScrollPaneConfig = new JScrollPane();
     }
 
     private void onLayerSelected(ListSelectionEvent e) {
@@ -103,8 +106,9 @@ public class ConfigDockable extends DefaultSingleCDockable {
         if (this.dataset != null) {
             this.configPanel.setDataset(this.dataset);
         }
-        this.getContentPane().add(this.configPanel, BorderLayout.CENTER);
-        this.configPanel.updateUI();
+        this.jScrollPaneConfig.setViewportView(this.configPanel);
+        this.getContentPane().add(jScrollPaneConfig, BorderLayout.CENTER);
+        this.jScrollPaneConfig.updateUI();
     }
 
     private void onLayerCheckChanged(ChangeEvent e) {

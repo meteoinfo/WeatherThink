@@ -31,7 +31,14 @@ public class Dataset {
         xArray = dimX.getDimArray();
         yArray = dimY.getDimArray();
         zArray = dimZ.getDimArray();
-        zArray = MeteoMath.press2Height(zArray);
+        switch (dimZ.getUnit()) {
+            case "hpa":
+                zArray = MeteoMath.press2Height(zArray);
+                break;
+            case "pa":
+                zArray = MeteoMath.press2Height(ArrayMath.div(zArray, 1000));
+                break;
+        }
     }
 
     /**
