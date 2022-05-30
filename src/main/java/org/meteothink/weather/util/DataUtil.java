@@ -4,7 +4,7 @@ import org.meteoinfo.data.meteodata.MeteoDataInfo;
 import org.meteoinfo.data.meteodata.Variable;
 import org.meteoinfo.math.meteo.MeteoMath;
 import org.meteoinfo.ndarray.Array;
-import org.meteoinfo.ndarray.Dimension;
+import org.meteoinfo.data.dimarray.Dimension;
 import org.meteoinfo.ndarray.InvalidRangeException;
 import org.meteoinfo.ndarray.Range;
 import org.meteoinfo.ndarray.math.ArrayMath;
@@ -47,9 +47,9 @@ public class DataUtil {
         Dimension dimX = dataInfo.getDataInfo().getXDimension();
         Dimension dimY = dataInfo.getDataInfo().getYDimension();
         Dimension dimZ = dataInfo.getDataInfo().getZDimension();
-        Array zArr = dimZ.getDimArray();
+        Array zArr = dimZ.getDimValue();
         zArr = MeteoMath.press2Height(zArr);
 
-        return new Array[]{dimX.getDimArray(), dimY.getDimArray(), zArr};
+        return new Array[]{dimX.getDimValue(), dimY.getDimValue(), zArr};
     }
 }

@@ -1,5 +1,6 @@
 package org.meteothink.weather.layer;
 
+import org.meteoinfo.common.colors.ColorMap;
 import org.meteoinfo.geometry.graphic.Graphic;
 import org.meteothink.weather.event.GraphicChangedEvent;
 import org.meteothink.weather.event.GraphicChangedListener;
@@ -21,21 +22,23 @@ public abstract class PlotLayer {
 
     /**
      * Factory method
+     *
      * @param layerType Layer type
+     * @param colorMaps Color maps
      * @return PlotLayer object
      */
-    public static PlotLayer factory(LayerType layerType) {
+    public static PlotLayer factory(LayerType layerType, ColorMap[] colorMaps) {
         switch (layerType) {
             case MAP_IMAGE:
                 return new MapImageLayer();
             case MAP_VECTOR:
                 return new MapVectorLayer();
             case SLICE:
-                return new SliceLayer();
+                return new SliceLayer(colorMaps);
             case ISO_SURFACE:
                 return new IsoSurfaceLayer();
             case VOLUME:
-                return new VolumeLayer();
+                return new VolumeLayer(colorMaps);
             case STREAMLINE:
                 return new StreamlineLayer();
             case WIND_VECTOR:

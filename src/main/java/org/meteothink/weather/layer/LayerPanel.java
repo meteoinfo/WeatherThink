@@ -1,5 +1,6 @@
 package org.meteothink.weather.layer;
 
+import org.meteoinfo.common.colors.ColorMap;
 import org.meteoinfo.data.meteodata.MeteoDataInfo;
 import org.meteoinfo.data.meteodata.Variable;
 import org.meteoinfo.geometry.graphic.Graphic;
@@ -13,6 +14,7 @@ public abstract class LayerPanel extends JPanel {
 
     protected PlotLayer layer;
     protected Dataset dataset;
+    protected ColorMap[] colorMaps;
 
     /**
      * Constructor
@@ -21,6 +23,17 @@ public abstract class LayerPanel extends JPanel {
      */
     public LayerPanel(PlotLayer layer) {
         this.layer = layer;
+    }
+
+    /**
+     * Constructor
+     *
+     * @param layer The plot layer
+     * @param colorMaps The color maps
+     */
+    public LayerPanel(PlotLayer layer, ColorMap[] colorMaps) {
+        this.layer = layer;
+        this.colorMaps = colorMaps;
     }
 
     /**
@@ -45,7 +58,15 @@ public abstract class LayerPanel extends JPanel {
             }
         }
         this.dataset = dataset;
-    };
+    }
+
+    /**
+     * Set color maps
+     * @param colorMaps Color maps
+     */
+    public void setColorMaps(ColorMap[] colorMaps) {
+        this.colorMaps = colorMaps;
+    }
 
     /**
      * Get 3D variables

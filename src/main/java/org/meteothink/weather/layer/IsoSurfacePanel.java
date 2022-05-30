@@ -1,22 +1,16 @@
 package org.meteothink.weather.layer;
 
 import org.meteoinfo.chart.jogl.JOGLUtil;
-import org.meteoinfo.data.meteodata.MeteoDataInfo;
+import org.meteoinfo.data.dimarray.DimArray;
 import org.meteoinfo.data.meteodata.Variable;
-import org.meteoinfo.geo.layout.LayoutGraphic;
 import org.meteoinfo.geometry.graphic.Graphic;
 import org.meteoinfo.geometry.graphic.GraphicCollection;
 import org.meteoinfo.geometry.legend.PolygonBreak;
-import org.meteoinfo.ndarray.Array;
-import org.meteoinfo.ndarray.InvalidRangeException;
 import org.meteoinfo.ndarray.math.ArrayMath;
 import org.meteothink.weather.data.Dataset;
-import org.meteothink.weather.util.DataUtil;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
@@ -30,7 +24,7 @@ public class IsoSurfacePanel extends LayerPanel {
     JLabel jLabelColor;
     JLabel jLabelColorView;
 
-    Array data;
+    DimArray data;
 
     /**
      * Constructor
@@ -128,13 +122,9 @@ public class IsoSurfacePanel extends LayerPanel {
             this.jComboBoxVariable.setSelectedIndex(0);
         }
 
-        try {
-            Array arr3d = this.dataset.read3DArray((String) this.jComboBoxVariable.getSelectedItem(), 0);
-            float mean = (float)ArrayMath.mean(arr3d);
-            this.jTextFieldValue.setText(String.valueOf(mean));
-        } catch (InvalidRangeException e) {
-            e.printStackTrace();
-        }
+        DimArray arr3d = this.dataset.read3DArray((String) this.jComboBoxVariable.getSelectedItem());
+        float mean = (float)ArrayMath.mean(arr3d.getArray());
+        this.jTextFieldValue.setText(String.valueOf(mean));
     }
 
     /**
@@ -158,27 +148,19 @@ public class IsoSurfacePanel extends LayerPanel {
         pb.setDrawOutline(false);
 
         if (data == null) {
-            try {
-                data = this.dataset.read3DArray(varName, 0);
-            } catch (InvalidRangeException e) {
-                e.printStackTrace();
-            }
+            data = this.dataset.read3DArray(varName);
         }
-        GraphicCollection graphic = JOGLUtil.isosurface(data, dataset.getXArray(), dataset.getYArray(),
-                dataset.getZArray(), value, pb, 4);
+        GraphicCollection graphic = JOGLUtil.isosurface(data.getArray(), data.getXDimension().getDimValue(),
+                data.getYDimension().getDimValue(), data.getZDimension().getDimValue(), value, pb, 4);
         return graphic;
     }
 
     private void onVariableChanged(ItemEvent e) {
         if(e.getStateChange() == ItemEvent.SELECTED) {
             if (this.dataset != null) {
-                try {
-                    data = this.dataset.read3DArray((String) this.jComboBoxVariable.getSelectedItem(), 0);
-                    float mean = (float) ArrayMath.mean(data);
-                    this.jTextFieldValue.setText(String.valueOf(mean));
-                } catch (InvalidRangeException ex) {
-                    ex.printStackTrace();
-                }
+                data = this.dataset.read3DArray((String) this.jComboBoxVariable.getSelectedItem());
+                float mean = (float) ArrayMath.mean(data.getArray());
+                this.jTextFieldValue.setText(String.valueOf(mean));
             }
         }
     }

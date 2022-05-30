@@ -51,6 +51,8 @@ public class FigureDockable extends DefaultSingleCDockable {
         plot3DGL.setClipPlane(false);
         //plot3DGL.setOrthographic(false);
         plot3DGL.setBackground(Color.black);
+        plot3DGL.setDrawBase(true);
+        plot3DGL.setBoxed(true);
         plot3DGL.setDisplayXY(true);
         plot3DGL.setDisplayZ(true);
         GridLine gridLine = plot3DGL.getGridLine();

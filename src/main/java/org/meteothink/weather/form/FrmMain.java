@@ -12,10 +12,11 @@ import org.meteothink.weather.data.Dataset;
 import javax.swing.*;
 import javax.xml.parsers.ParserConfigurationException;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.io.File;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,14 +30,12 @@ public class FrmMain extends JFrame {
     private JMenu jMenuOptions;
     private JMenuItem jMenuItemSetting;
 
+    private JPanel jPanelToolBar;
     private JToolBar jToolBar;
     private JButton jButtonOpenFile;
+    private JComboBox jComboBoxTimes;
 
-    private JPanel jPanelMain;
-    private JPanel jPanelSetting;
-    private JPanel jPanelView;
-    private JPanel jPanelPlot;
-    private ConfigDockable configDockable;
+    private RenderDockable configDockable;
     private FigureDockable figureDockable;
 
     private JPanel jPanelStatus;
@@ -46,6 +45,8 @@ public class FrmMain extends JFrame {
 
     private String startupPath;
     private Options options;
+
+    private Dataset dataset;
 
     /**
      * Constructor
@@ -98,7 +99,7 @@ public class FrmMain extends JFrame {
         CGrid grid = new CGrid(control);
 
         figureDockable = new FigureDockable(this, this.startupPath, "图形");
-        configDockable = new ConfigDockable(this, "Configure", this.startupPath);
+        configDockable = new RenderDockable(this, "Configure", this.startupPath);
         grid.add(0, 0, 3, 10, configDockable);
         grid.add(3, 0, 7, 10, figureDockable);
         control.getContentArea().deploy(grid);
@@ -150,6 +151,8 @@ public class FrmMain extends JFrame {
         this.setJMenuBar(jMenuBar);
 
         //Toolbar
+        jPanelToolBar = new JPanel();
+        jPanelToolBar.setLayout(new BorderLayout());
         this.jToolBar = new JToolBar();
         this.jButtonOpenFile = new JButton();
         jButtonOpenFile.setIcon(new FlatSVGIcon("org/meteothink/weather/icons/file-open.svg"));
@@ -161,6 +164,17 @@ public class FrmMain extends JFrame {
             }
         });
         this.jToolBar.add(jButtonOpenFile);
+        jToolBar.addSeparator();
+        jComboBoxTimes = new JComboBox();
+        jComboBoxTimes.setPrototypeDisplayValue("yyyy-mm-dd HH:MM");
+        jComboBoxTimes.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                onTimeChanged(e);
+            }
+        });
+        jToolBar.add(jComboBoxTimes);
+        jPanelToolBar.add(jToolBar, BorderLayout.LINE_START);
 
         //Main panel
         /*this.jPanelMain = new JPanel();
@@ -199,7 +213,7 @@ public class FrmMain extends JFrame {
         jPanelStatus.add(jProgressBarMemory, java.awt.BorderLayout.EAST);
 
         //Add components
-        this.getContentPane().add(jToolBar, BorderLayout.NORTH);
+        this.getContentPane().add(jPanelToolBar, BorderLayout.NORTH);
         //this.getContentPane().add(jPanelMain, BorderLayout.CENTER);
         this.getContentPane().add(jPanelStatus, BorderLayout.SOUTH);
         this.pack();
@@ -228,14 +242,35 @@ public class FrmMain extends JFrame {
             File file = aDlg.getSelectedFile();
             this.options.setCurrentPath(file.getParent());
             MeteoDataInfo meteoDataInfo = new MeteoDataInfo();
-            meteoDataInfo.openNetCDFData(file.getAbsolutePath());
-            Dataset dataset = new Dataset(meteoDataInfo);
-            this.figureDockable.getPlot().setExtent(dataset.getExtent3D());
-            this.figureDockable.getPlot().setDrawExtent(dataset.getExtent3D());
-            this.figureDockable.getPlot().setFixExtent(true);
-            if (this.configDockable != null)
-                this.configDockable.setDataset(dataset);
+            String fileName = file.getAbsolutePath();
+            if (fileName.endsWith(".ctl"))
+                meteoDataInfo.openGrADSData(fileName);
+            else
+                meteoDataInfo.openNetCDFData(fileName);
+            dataset = new Dataset(meteoDataInfo);
+            setDataset(dataset);
             this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+        }
+    }
+
+    private void setDataset(Dataset dataset) {
+        this.figureDockable.getPlot().setExtent(dataset.getExtent3D());
+        this.figureDockable.getPlot().setDrawExtent(dataset.getExtent3D());
+        this.figureDockable.getPlot().setFixExtent(true);
+        if (this.configDockable != null)
+            this.configDockable.setDataset(dataset);
+
+        this.jComboBoxTimes.setVisible(true);
+        DateTimeFormatter sdf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        List<LocalDateTime> times = dataset.getDataInfo().getDataInfo().getTimes();
+        if (times == null) {
+            this.jComboBoxTimes.removeAllItems();
+        } else {
+            DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
+            for (int i = 0; i < times.size(); i++) {
+                comboBoxModel.addElement(sdf.format(times.get(i)));
+            }
+            this.jComboBoxTimes.setModel(comboBoxModel);
         }
     }
 
@@ -283,9 +318,15 @@ public class FrmMain extends JFrame {
 
     /**
      * Get config dockable
-     * @return Config dockble
+     * @return Config dockable
      */
-    public ConfigDockable getConfigDockable() {
+    public RenderDockable getConfigDockable() {
         return this.configDockable;
+    }
+
+    private void onTimeChanged(ItemEvent e) {
+        if(e.getStateChange() == ItemEvent.SELECTED) {
+            this.dataset.setTimeIndex(this.jComboBoxTimes.getSelectedIndex());
+        }
     }
 }

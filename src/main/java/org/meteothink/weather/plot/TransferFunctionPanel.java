@@ -1,19 +1,19 @@
 package org.meteothink.weather.plot;
 
-import org.meteoinfo.chart.render.TransferFunction;
+import org.meteoinfo.geometry.colors.TransferFunction;
 import org.meteoinfo.common.colors.ColorMap;
 import org.meteoinfo.ndarray.Array;
 import org.meteoinfo.ndarray.math.ArrayMath;
 import org.meteoinfo.ndarray.math.ArrayUtil;
+import org.meteoinfo.ui.ColorComboBoxModel;
+import org.meteoinfo.ui.ColorListCellRender;
 import org.meteothink.weather.event.TransferFunctionChangedEvent;
 import org.meteothink.weather.event.TransferFunctionChangedListener;
 
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
+import java.awt.event.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
@@ -24,6 +24,8 @@ import java.util.List;
 public class TransferFunctionPanel extends JPanel {
     private final EventListenerList listeners = new EventListenerList();
     private ColorMap colorMap;
+    private ColorMap[] colorMaps;
+    private JComboBox jComboBoxColorMap;
     private Array data;
     private double minData, maxData;
     private double minValue, maxValue;
@@ -48,9 +50,21 @@ public class TransferFunctionPanel extends JPanel {
      * @param colorMap The color map
      */
     public TransferFunctionPanel(Array data, ColorMap colorMap) {
+        this(data, colorMap, null);
+    }
+
+    /**
+     * Constructor
+     * @param data The data array
+     * @param colorMap The color map
+     */
+    public TransferFunctionPanel(Array data, ColorMap colorMap, ColorMap[] colorMaps) {
         super();
         this.setPreferredSize(new Dimension(200, 120));
 
+        if (colorMaps != null) {
+            setColorMaps(colorMaps);
+        }
         this.colorMap = colorMap;
         colorControlPoints.add(new ControlPoint(0.f));
         colorControlPoints.add(new ControlPoint(1.f));
@@ -75,8 +89,7 @@ public class TransferFunctionPanel extends JPanel {
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                selectedPoint = mouseSelectPoint(e);
-                TransferFunctionPanel.this.repaint();
+                onMouseClicked(e);
             }
 
             @Override
@@ -174,6 +187,31 @@ public class TransferFunctionPanel extends JPanel {
      */
     public void setColorMap(ColorMap value) {
         this.colorMap = value;
+    }
+
+    /**
+     * Set color maps
+     * @param value Color maps
+     */
+    public void setColorMaps(ColorMap[] value) {
+        this.colorMaps = value;
+        if (this.jComboBoxColorMap == null) {
+            this.jComboBoxColorMap = new JComboBox();
+            this.add(jComboBoxColorMap);
+        }
+
+        ColorListCellRender render = new ColorListCellRender();
+        render.setPreferredSize(new Dimension(62, 21));
+        this.jComboBoxColorMap.setModel(new ColorComboBoxModel(colorMaps));
+        this.jComboBoxColorMap.setRenderer(render);
+        this.jComboBoxColorMap.setSelectedItem(this.colorMap);
+
+        jComboBoxColorMap.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                onColormapChanged(e);
+            }
+        });
     }
 
     /**
@@ -373,6 +411,65 @@ public class TransferFunctionPanel extends JPanel {
         return null;
     }
 
+    private void onMouseClicked(MouseEvent e) {
+        selectedPoint = mouseSelectPoint(e);
+        if (e.getButton() == MouseEvent.BUTTON1) {
+            TransferFunctionPanel.this.repaint();
+        } else if (e.getButton() == MouseEvent.BUTTON3) {
+            if (mouseInColorMap(e)) {
+                if (jComboBoxColorMap != null) {
+                    jComboBoxColorMap.setLocation(this.getX(), this.getY() +
+                            this.getHeight() - 20);
+                    jComboBoxColorMap.setSize(this.getWidth(), 20);
+                    jComboBoxColorMap.showPopup();
+                }
+            } else if (mouseInHistogram(e)) {
+                JPopupMenu popupMenu = new JPopupMenu();
+                JMenuItem jMenuItemControlPoint = new JMenuItem();
+                if (selectedPoint == null) {
+                    jMenuItemControlPoint.setText("Add control point");
+                    jMenuItemControlPoint.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent ae) {
+                            Rectangle2D.Float extent = getHistogramExtent();
+                            float ratio = (e.getX() - extent.x) / extent.width;
+                            float opacity = 1 - (e.getY() - extent.y) / extent.height;
+                            OpacityControlPoint newOcp = new OpacityControlPoint(ratio);
+                            newOcp.setOpacity(opacity);
+                            newOcp.setSelected(true);
+                            int i = 0;
+                            for (OpacityControlPoint ocp : opacityControlPoints) {
+                                if (ratio < ocp.getRatio()) {
+                                    break;
+                                }
+                                i += 1;
+                            }
+                            if (i > 0) {
+                                newOcp.setMinRatio(opacityControlPoints.get(i - 1).getMinRatio());
+                            }
+                            if (i < opacityControlPoints.size()) {
+                                newOcp.setMaxRatio(opacityControlPoints.get(i).getMaxRatio());
+                            }
+                            opacityControlPoints.add(i, newOcp);
+                            TransferFunctionPanel.this.repaint();
+                        }
+                    });
+                } else {
+                    jMenuItemControlPoint.setText("Delete control point");
+                    jMenuItemControlPoint.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent ae) {
+                            opacityControlPoints.remove(selectedPoint);
+                            TransferFunctionPanel.this.repaint();
+                        }
+                    });
+                }
+                popupMenu.add(jMenuItemControlPoint);
+                popupMenu.show(TransferFunctionPanel.this, e.getX(), e.getY());
+            }
+        }
+    }
+
     private void onMouseDragged(MouseEvent e) {
         if (selectedPoint != null) {
             if (selectedPoint instanceof OpacityControlPoint) {
@@ -387,6 +484,17 @@ public class TransferFunctionPanel extends JPanel {
             }
             this.repaint();
         }
+    }
+
+    private void onColormapChanged(ItemEvent e) {
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+            ColorMap colorMap = (ColorMap) this.jComboBoxColorMap.getSelectedItem();
+            this.setColorMap(colorMap);
+            this.updateUI();
+            this.fileTransferFunctionChangedEvent();
+        }
+        this.jComboBoxColorMap.hidePopup();
+        this.jComboBoxColorMap.setSize(this.jComboBoxColorMap.getWidth(), 0);
     }
 
     /**

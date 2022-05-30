@@ -1,12 +1,16 @@
 package org.meteothink.weather.layer;
 
+import org.meteoinfo.common.colors.ColorMap;
+
 public class VolumeLayer extends PlotLayer {
 
     /**
      * Constructor
+     *
+     * @param colorMaps The color maps
      */
-    public VolumeLayer() {
-        this.configPanel = new VolumePanel(this);
+    public VolumeLayer(ColorMap[] colorMaps) {
+        this.configPanel = new VolumePanel(this, colorMaps);
     }
 
     @Override

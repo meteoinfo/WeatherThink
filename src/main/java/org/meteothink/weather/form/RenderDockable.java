@@ -3,7 +3,8 @@ package org.meteothink.weather.form;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.action.CAction;
 import org.meteoinfo.chart.jogl.Plot3DGL;
-import org.meteoinfo.data.meteodata.MeteoDataInfo;
+import org.meteoinfo.common.colors.ColorMap;
+import org.meteoinfo.common.colors.ColorUtil;
 import org.meteoinfo.geometry.graphic.Graphic;
 import org.meteoinfo.ui.CheckBoxListEntry;
 import org.meteoinfo.ui.JCheckBoxList;
@@ -22,37 +23,47 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ConfigDockable extends DefaultSingleCDockable {
+public class RenderDockable extends DefaultSingleCDockable {
 
     private JPanel jPanelLayers;
     private JScrollPane jScrollPaneLayers;
     private JCheckBoxList jCheckBoxListLayers;
-    private LayerPanel configPanel;
+    private LayerPanel layerPanel;
     private JScrollPane jScrollPaneConfig;
 
     private FrmMain parent;
     private Plot3DGL plot3DGL;
     private String startPath;
+    private ColorMap[] colorMaps;
 
     private List<PlotLayer> layers = new ArrayList<>();
 
     private Dataset dataset;
 
-    public ConfigDockable(String s, CAction... cActions) {
+    public RenderDockable(String s, CAction... cActions) {
         super(s, cActions);
 
         initComponents();
     }
 
-    public ConfigDockable(final FrmMain parent, String s, String startPath, CAction... cActions) {
+    public RenderDockable(final FrmMain parent, String s, String startPath, CAction... cActions) {
         super(s, cActions);
 
         this.parent = parent;
         this.plot3DGL = parent.getFigureDockable().getPlot();
         this.startPath = startPath;
+
+        String path = System.getProperty("user.dir");
+        path = path + File.separator + "data" + File.separator + "colormaps";
+        try {
+            colorMaps = ColorUtil.getColorMaps(path);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         initComponents();
     }
@@ -64,7 +75,7 @@ public class ConfigDockable extends DefaultSingleCDockable {
 
         DefaultListModel listModel = new DefaultListModel();
         for (LayerType layerType : LayerType.values()) {
-            PlotLayer layer = PlotLayer.factory(layerType);
+            PlotLayer layer = PlotLayer.factory(layerType, colorMaps);
             layer.addGraphicChangedListener(new GraphicChangedListener() {
                 @Override
                 public void graphicChangedEvent(GraphicChangedEvent e) {
@@ -99,15 +110,16 @@ public class ConfigDockable extends DefaultSingleCDockable {
     private void onLayerSelected(ListSelectionEvent e) {
         CheckBoxListEntry cb = (CheckBoxListEntry) this.jCheckBoxListLayers.getSelectedValue();
         PlotLayer layer = (PlotLayer) cb.getValue();
-        if (configPanel != null) {
-            this.getContentPane().remove(this.configPanel);
+        if (layerPanel != null) {
+            this.getContentPane().remove(this.layerPanel);
         }
-        this.configPanel = layer.getConfigPanel();
-        if (this.dataset != null) {
-            this.configPanel.setDataset(this.dataset);
-        }
-        this.jScrollPaneConfig.setViewportView(this.configPanel);
+        this.layerPanel = layer.getConfigPanel();
+        this.layerPanel.setColorMaps(this.colorMaps);
+        this.jScrollPaneConfig.setViewportView(this.layerPanel);
         this.getContentPane().add(jScrollPaneConfig, BorderLayout.CENTER);
+        if (this.dataset != null) {
+            this.layerPanel.setDataset(this.dataset);
+        }
         this.jScrollPaneConfig.updateUI();
     }
 
@@ -155,9 +167,9 @@ public class ConfigDockable extends DefaultSingleCDockable {
     public void setDataset(Dataset dataset) {
         this.dataset = dataset;
         this.setTitleText(new File(dataset.getDataInfo().getFileName()).getName());
-        if (this.configPanel != null) {
-            this.configPanel.setDataset(dataset);
-            this.configPanel.updateUI();
+        if (this.layerPanel != null) {
+            this.layerPanel.setDataset(dataset);
+            this.layerPanel.updateUI();
         }
     }
 }

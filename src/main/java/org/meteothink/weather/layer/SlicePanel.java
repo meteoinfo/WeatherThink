@@ -4,23 +4,21 @@ import org.meteoinfo.chart.graphic.SurfaceGraphics;
 import org.meteoinfo.chart.jogl.JOGLUtil;
 import org.meteoinfo.common.colors.ColorMap;
 import org.meteoinfo.common.colors.ColorUtil;
-import org.meteoinfo.data.meteodata.MeteoDataInfo;
+import org.meteoinfo.data.dimarray.DimArray;
 import org.meteoinfo.data.meteodata.Variable;
 import org.meteoinfo.geo.legend.FrmLegendBreaks;
 import org.meteoinfo.geo.legend.LegendManage;
 import org.meteoinfo.geometry.colors.Normalize;
 import org.meteoinfo.geometry.graphic.Graphic;
-import org.meteoinfo.geometry.graphic.GraphicCollection;
 import org.meteoinfo.geometry.legend.LegendScheme;
 import org.meteoinfo.geometry.shape.ShapeTypes;
-import org.meteoinfo.ndarray.Array;
 import org.meteoinfo.ndarray.InvalidRangeException;
 import org.meteoinfo.ndarray.math.ArrayMath;
 import org.meteoinfo.ui.ColorComboBoxModel;
 import org.meteoinfo.ui.ColorListCellRender;
+import org.meteoinfo.ui.slider.RangeSlider;
 import org.meteothink.weather.data.Dataset;
-import org.meteothink.weather.util.DataUtil;
-import org.python.antlr.ast.Num;
+import org.meteothink.weather.plot.TransferFunctionPanel;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -41,20 +39,30 @@ public class SlicePanel extends LayerPanel implements ItemListener {
     JComboBox jComboBoxVariable;
     JLabel jLabelColorMap;
     JComboBox jComboBoxColorMap;
+    TransferFunctionPanel transferFunctionPanel;
+    JLabel jLabelDataValue;
+    JTextField jTextFieldDataValue;
+    JLabel jLabelOpacity;
+    JTextField jTextFieldOpacity;
+    //RangeSlider jSliderValue;
+    JTextField jTextFieldMinValue;
+    JTextField jTextFieldMaxValue;
     JLabel jLabelSliceXYZ;
     JRadioButton jRadioButtonX;
     JRadioButton jRadioButtonY;
     JRadioButton jRadioButtonZ;
     ButtonGroup buttonGroupXYZ;
-    JSlider jSliderValue;
+    JSlider jSliderSliceValue;
 
-    Array data;
+    DimArray data;
 
     /**
      * Constructor
+     * @param layer The plot layer
+     * @param colorMaps The color maps
      */
-    public SlicePanel(PlotLayer layer) {
-        super(layer);
+    public SlicePanel(PlotLayer layer, ColorMap[] colorMaps) {
+        super(layer, colorMaps);
 
         Border border = BorderFactory.createTitledBorder("数据切片设置");
         this.setBorder(border);
@@ -66,8 +74,6 @@ public class SlicePanel extends LayerPanel implements ItemListener {
         //Variable
         this.jLabelVariable = new JLabel("变量:");
         this.jComboBoxVariable = new JComboBox();
-        this.add(jLabelVariable);
-        this.add(jComboBoxVariable);
         jComboBoxVariable.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -77,7 +83,6 @@ public class SlicePanel extends LayerPanel implements ItemListener {
 
         //Color map
         jLabelColorMap = new JLabel("颜色方案:");
-        this.add(jLabelColorMap);
         jComboBoxColorMap = new JComboBox();
         jComboBoxColorMap.setPreferredSize(new Dimension(200, 20));
         ColorMap[] colorTables;
@@ -96,10 +101,18 @@ public class SlicePanel extends LayerPanel implements ItemListener {
         } catch (IOException ex) {
             Logger.getLogger(FrmLegendBreaks.class.getName()).log(Level.SEVERE, null, ex);
         }
-        this.add(jComboBoxColorMap);
+        jComboBoxColorMap.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                Graphic graphic = createGraphic();
+                if (graphic != null) {
+                    layer.fileGraphicChangedEvent(graphic);
+                }
+            }
+        });
 
         //Slice direction
-        jLabelSliceXYZ = new JLabel("切片方向");
+        jLabelSliceXYZ = new JLabel("切片方向:");
         buttonGroupXYZ = new ButtonGroup();
         jRadioButtonX = new JRadioButton("X", true);
         jRadioButtonY = new JRadioButton("Y");
@@ -110,20 +123,51 @@ public class SlicePanel extends LayerPanel implements ItemListener {
         buttonGroupXYZ.add(jRadioButtonX);
         buttonGroupXYZ.add(jRadioButtonY);
         buttonGroupXYZ.add(jRadioButtonZ);
-        this.add(jLabelSliceXYZ);
-        this.add(jRadioButtonX);
-        this.add(jRadioButtonY);
-        this.add(jRadioButtonZ);
 
         //Value slider
-        jSliderValue = new JSlider();
-        jSliderValue.addChangeListener(new ChangeListener() {
+        jSliderSliceValue = new JSlider();
+        jSliderSliceValue.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
                 onSliderValueChanged(e);
             }
         });
-        this.add(jSliderValue);
+
+        //Layout
+        GroupLayout layout = new GroupLayout(this);
+        this.setLayout(layout);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        layout.setHorizontalGroup(
+                layout.createParallelGroup()
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabelVariable)
+                                .addComponent(jComboBoxVariable))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabelColorMap)
+                                .addComponent(jComboBoxColorMap))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabelSliceXYZ)
+                                .addComponent(jRadioButtonX)
+                                .addComponent(jRadioButtonY)
+                                .addComponent(jRadioButtonZ))
+                        .addComponent(jSliderSliceValue)
+        );
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(jLabelVariable)
+                                .addComponent(jComboBoxVariable))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(jLabelColorMap)
+                                .addComponent(jComboBoxColorMap, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(jLabelSliceXYZ)
+                                .addComponent(jRadioButtonX)
+                                .addComponent(jRadioButtonY)
+                                .addComponent(jRadioButtonZ))
+                        .addComponent(jSliderSliceValue)
+        );
     }
 
     @Override
@@ -160,23 +204,19 @@ public class SlicePanel extends LayerPanel implements ItemListener {
         }
 
         if (data == null) {
-            try {
-                String varName = (String) this.jComboBoxVariable.getSelectedItem();
-                data = this.dataset.read3DArray(varName, 0);
-            } catch (InvalidRangeException e) {
-                e.printStackTrace();
-            }
+            String varName = (String) this.jComboBoxVariable.getSelectedItem();
+            data = this.dataset.read3DArray(varName);
         }
         ColorMap colorMap = (ColorMap) this.jComboBoxColorMap.getSelectedItem();
-        double vMin = ArrayMath.min(data).doubleValue();
-        double vMax = ArrayMath.max(data).doubleValue();
+        double vMin = ArrayMath.min(data.getArray()).doubleValue();
+        double vMax = ArrayMath.max(data.getArray()).doubleValue();
         Normalize normalize = new Normalize(vMin, vMax, true);
         List<Number> opacityLevels = new ArrayList<>();
         opacityLevels.add(0.0f);
         opacityLevels.add(1.0f);
         LegendScheme ls = LegendManage.createLegendScheme(vMin, vMax, colorMap);
         ls = ls.convertTo(ShapeTypes.POLYGON);
-        int v = this.jSliderValue.getValue();
+        int v = this.jSliderSliceValue.getValue();
         List<Number> xSlice = new ArrayList<>();
         List<Number> ySlice = new ArrayList<>();
         List<Number> zSlice = new ArrayList<>();
@@ -189,7 +229,7 @@ public class SlicePanel extends LayerPanel implements ItemListener {
         }
 
         try {
-            List graphics = JOGLUtil.slice(data, dataset.getXArray(), dataset.getYArray(),
+            List graphics = JOGLUtil.slice(data.getArray(), dataset.getXArray(), dataset.getYArray(),
                     dataset.getZArray(), xSlice, ySlice, zSlice, ls);
             SurfaceGraphics graphic = (SurfaceGraphics) graphics.get(0);
             graphic.setFaceInterp(true);
@@ -203,14 +243,10 @@ public class SlicePanel extends LayerPanel implements ItemListener {
     private void onVariableChanged(ItemEvent e) {
         if(e.getStateChange() == ItemEvent.SELECTED) {
             if (this.dataset != null) {
-                try {
-                    data = dataset.read3DArray((String) this.jComboBoxVariable.getSelectedItem(), 0);
-                    Graphic graphic = createGraphic();
-                    if (graphic != null) {
-                        this.layer.fileGraphicChangedEvent(graphic);
-                    }
-                } catch (InvalidRangeException ex) {
-                    ex.printStackTrace();
+                data = dataset.read3DArray((String) this.jComboBoxVariable.getSelectedItem());
+                Graphic graphic = createGraphic();
+                if (graphic != null) {
+                    this.layer.fileGraphicChangedEvent(graphic);
                 }
             }
         }
@@ -220,7 +256,7 @@ public class SlicePanel extends LayerPanel implements ItemListener {
     public void itemStateChanged(ItemEvent e) {
         if (e.getSource() instanceof JRadioButton) {
             if (((JRadioButton) e.getSource()).isSelected())
-                this.jSliderValue.setValue(50);
+                this.jSliderSliceValue.setValue(50);
         }
     }
 
