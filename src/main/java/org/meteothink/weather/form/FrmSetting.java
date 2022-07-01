@@ -67,9 +67,6 @@ public class FrmSetting extends javax.swing.JDialog {
         jPanel_Appearance = new javax.swing.JPanel();
         jLabel_LookFeel = new javax.swing.JLabel();
         jComboBox_LookFeel = new javax.swing.JComboBox<>();
-        jLabel_Font = new javax.swing.JLabel();
-        jTextField_Font = new javax.swing.JTextField();
-        jButton_Font = new javax.swing.JButton();
         jCheckBox_LafDecorated = new javax.swing.JCheckBox();
         jCheckBox_DockWindowDecorated = new javax.swing.JCheckBox();
         jLabel1 = new javax.swing.JLabel();
@@ -80,17 +77,13 @@ public class FrmSetting extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("设置");
 
-        jLabel_LookFeel.setText("Look&Feel:");
+        jLabel_LookFeel.setText("Look&Feel: ");
 
         jComboBox_LookFeel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox_LookFeelActionPerformed(evt);
             }
         });
-
-        jLabel_Font.setText("字体:");
-
-        jTextField_Font.setEditable(false);
 
         jCheckBox_LafDecorated.setText("Laf decorated");
 
@@ -106,15 +99,8 @@ public class FrmSetting extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(jPanel_AppearanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel_AppearanceLayout.createSequentialGroup()
-                        .addGroup(jPanel_AppearanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel_AppearanceLayout.createSequentialGroup()
                             .addComponent(jLabel_LookFeel)
-                            .addComponent(jLabel_Font))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
-                        .addGroup(jPanel_AppearanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel_AppearanceLayout.createSequentialGroup()
-                                .addComponent(jTextField_Font)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton_Font, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(jComboBox_LookFeel, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel_AppearanceLayout.createSequentialGroup()
                         .addGroup(jPanel_AppearanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -132,10 +118,6 @@ public class FrmSetting extends javax.swing.JDialog {
                     .addComponent(jLabel_LookFeel)
                     .addComponent(jComboBox_LookFeel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel_AppearanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel_Font)
-                    .addComponent(jTextField_Font, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton_Font))
                 .addGroup(jPanel_AppearanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel_AppearanceLayout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -150,7 +132,7 @@ public class FrmSetting extends javax.swing.JDialog {
 
         jTabbedPane1.addTab("Appearance", jPanel_Appearance);
 
-        jCheckBox_DoubleBuffering.setText("Double Buffering");
+        /*jCheckBox_DoubleBuffering.setText("Double Buffering");
 
         javax.swing.GroupLayout jPanel_PlotLayout = new javax.swing.GroupLayout(jPanel_Plot);
         jPanel_Plot.setLayout(jPanel_PlotLayout);
@@ -169,7 +151,7 @@ public class FrmSetting extends javax.swing.JDialog {
                 .addContainerGap(105, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("Plot", jPanel_Plot);
+        jTabbedPane1.addTab("Plot", jPanel_Plot);*/
 
         jButton_Apply.setText("Apply");
         jButton_Apply.addActionListener(new java.awt.event.ActionListener() {
@@ -328,17 +310,14 @@ public class FrmSetting extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton_Apply;
-    private javax.swing.JButton jButton_Font;
     private javax.swing.JCheckBox jCheckBox_DockWindowDecorated;
     private javax.swing.JCheckBox jCheckBox_DoubleBuffering;
     private javax.swing.JCheckBox jCheckBox_LafDecorated;
     private javax.swing.JComboBox<String> jComboBox_LookFeel;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel_Font;
     private javax.swing.JLabel jLabel_LookFeel;
     private javax.swing.JPanel jPanel_Appearance;
     private javax.swing.JPanel jPanel_Plot;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JTextField jTextField_Font;
     // End of variables declaration//GEN-END:variables
 }

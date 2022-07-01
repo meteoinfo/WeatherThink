@@ -15,6 +15,7 @@ import org.meteoinfo.data.dimarray.Dimension;
 import org.meteoinfo.ndarray.InvalidRangeException;
 import org.meteoinfo.ndarray.Range;
 import org.meteoinfo.ndarray.math.ArrayMath;
+import org.meteoinfo.projection.ProjectionInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -180,6 +181,14 @@ public class Dataset {
     }
 
     /**
+     * Get projection
+     * @return Projection
+     */
+    public ProjectionInfo getProjInfo() {
+        return this.dataInfo.getProjectionInfo();
+    }
+
+    /**
      * Get whether the dataset is from WRF model
      * @return Boolean
      */
@@ -245,6 +254,7 @@ public class Dataset {
                     case "eta":
                         if (isWRF()) {
                             zDim.setDimValue(WRFUtil.getGPM1D(this.dataInfo.getDataInfo()).getArray());
+                            zDim.setUnit("m");
                         }
                         break;
                 }

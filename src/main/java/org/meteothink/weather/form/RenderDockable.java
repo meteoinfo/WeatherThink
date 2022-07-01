@@ -2,6 +2,7 @@ package org.meteothink.weather.form;
 
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.action.CAction;
+import com.formdev.flatlaf.extras.FlatSVGIcon;
 import org.meteoinfo.chart.jogl.Plot3DGL;
 import org.meteoinfo.common.colors.ColorMap;
 import org.meteoinfo.common.colors.ColorUtil;
@@ -57,6 +58,8 @@ public class RenderDockable extends DefaultSingleCDockable {
         this.plot3DGL = parent.getFigureDockable().getPlot();
         this.startPath = startPath;
 
+        this.setTitleIcon(new FlatSVGIcon("icons/setting.svg"));
+
         String path = System.getProperty("user.dir");
         path = path + File.separator + "data" + File.separator + "colormaps";
         try {
@@ -74,7 +77,9 @@ public class RenderDockable extends DefaultSingleCDockable {
         jCheckBoxListLayers = new JCheckBoxList();
 
         DefaultListModel listModel = new DefaultListModel();
-        for (LayerType layerType : LayerType.values()) {
+        LayerType[] layerTypes = new LayerType[]{LayerType.MAP_IMAGE, LayerType.SLICE,
+                LayerType.ISO_SURFACE, LayerType.VOLUME};
+        for (LayerType layerType : layerTypes) {
             PlotLayer layer = PlotLayer.factory(layerType, colorMaps);
             layer.addGraphicChangedListener(new GraphicChangedListener() {
                 @Override
@@ -165,11 +170,28 @@ public class RenderDockable extends DefaultSingleCDockable {
      * @param dataset Dataset
      */
     public void setDataset(Dataset dataset) {
+        boolean projChanged = false;
+        if (this.dataset == null) {
+            projChanged = true;
+        } else {
+            if (!this.dataset.getProjInfo().equals(dataset.getProjInfo())) {
+                projChanged = true;
+            }
+        }
+
         this.dataset = dataset;
         this.setTitleText(new File(dataset.getDataInfo().getFileName()).getName());
         if (this.layerPanel != null) {
             this.layerPanel.setDataset(dataset);
             this.layerPanel.updateUI();
+        }
+
+        if (projChanged) {
+            for (PlotLayer layer : this.layers) {
+                if (layer.getLayerType() == LayerType.MAP_IMAGE) {
+                    layer.setGraphic(null);
+                }
+            }
         }
     }
 }

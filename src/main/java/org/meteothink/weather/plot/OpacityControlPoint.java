@@ -9,8 +9,18 @@ public class OpacityControlPoint extends ControlPoint{
      * @param value The value
      */
     public OpacityControlPoint(float value) {
+        this(value, value);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param value The value
+     * @param opacity The opacity
+     */
+    public OpacityControlPoint(float value, float opacity) {
         super(value);
-        this.opacity = value;
+        this.opacity = opacity;
     }
 
     /**

@@ -1,5 +1,6 @@
 package org.meteothink.weather.form;
 
+import bibliothek.gui.dock.ScreenDockStation;
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CGrid;
 import bibliothek.gui.dock.common.theme.ThemeMap;
@@ -29,6 +30,8 @@ public class FrmMain extends JFrame {
     private JMenuItem jMenuItemExit;
     private JMenu jMenuOptions;
     private JMenuItem jMenuItemSetting;
+    private JMenu jMenuHelp;
+    private JMenuItem jMenuItemAbout;
 
     private JPanel jPanelToolBar;
     private JToolBar jToolBar;
@@ -84,21 +87,28 @@ public class FrmMain extends JFrame {
         System.out.println("Add dockable panels...");
         CControl control = new CControl(this);
         this.add(control.getContentArea());
-        /*if (this.options.isDockWindowDecorated()) {
-            control.putProperty(ScreenDockStation.WINDOW_FACTORY, new CustomWindowFactory());
-        }*/
+        control.putProperty(ScreenDockStation.WINDOW_FACTORY, new CustomWindowFactory());
         control.setTheme(ThemeMap.KEY_FLAT_THEME);
-        control.getIcons().setIconClient("locationmanager.minimize", new FlatSVGIcon("org/meteothink/weather/icons/minimize.svg"));
-        control.getIcons().setIconClient("locationmanager.maximize", new FlatSVGIcon("org/meteothink/weather/icons/maximize.svg"));
-        control.getIcons().setIconClient("locationmanager.externalize", new FlatSVGIcon("org/meteothink/weather/icons/outgoing.svg"));
-        control.getIcons().setIconClient("locationmanager.unexternalize", new FlatSVGIcon("org/meteothink/weather/icons/incoming.svg"));
-        control.getIcons().setIconClient("locationmanager.normalize", new FlatSVGIcon("org/meteothink/weather/icons/restore.svg"));
-        control.getIcons().setIconClient("locationmanager.unmaximize_externalized", new FlatSVGIcon("org/meteothink/weather/icons/restore.svg"));
+        control.getIcons().setIconClient("locationmanager.minimize", new FlatSVGIcon("icons/minimize.svg"));
+        control.getIcons().setIconClient("locationmanager.maximize", new FlatSVGIcon("icons/maximize.svg"));
+        control.getIcons().setIconClient("locationmanager.externalize", new FlatSVGIcon("icons/outgoing.svg"));
+        control.getIcons().setIconClient("locationmanager.unexternalize", new FlatSVGIcon("icons/incoming.svg"));
+        control.getIcons().setIconClient("locationmanager.normalize", new FlatSVGIcon("icons/restore.svg"));
+        control.getIcons().setIconClient("locationmanager.unmaximize_externalized", new FlatSVGIcon("icons/restore.svg"));
 
         System.out.println("Editor and Console panels...");
         CGrid grid = new CGrid(control);
 
         figureDockable = new FigureDockable(this, this.startupPath, "图形");
+        figureDockable.buttonFullExtent.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (dataset != null) {
+                    figureDockable.getPlot().setDrawExtent(dataset.getExtent3D());
+                    figureDockable.getPlot().setAxesExtent(dataset.getExtent3D());
+                }
+            }
+        });
         configDockable = new RenderDockable(this, "Configure", this.startupPath);
         grid.add(0, 0, 3, 10, configDockable);
         grid.add(3, 0, 7, 10, figureDockable);
@@ -111,6 +121,7 @@ public class FrmMain extends JFrame {
 
     private void initComponents() {
         //Menu
+        //File menu
         this.jMenuBar = new JMenuBar();
         this.jMenuFile = new JMenu("文件");
         this.jMenuItemFileOpen = new JMenuItem("打开");
@@ -135,9 +146,10 @@ public class FrmMain extends JFrame {
 
         this.jMenuBar.add(jMenuFile);
 
+        //Options menu
         this.jMenuOptions = new JMenu("选项");
         this.jMenuItemSetting = new JMenuItem("设置");
-        jMenuItemSetting.setIcon(new FlatSVGIcon("org/meteothink/weather/icons/gear.svg"));
+        jMenuItemSetting.setIcon(new FlatSVGIcon("icons/gear.svg"));
         jMenuItemSetting.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -148,6 +160,19 @@ public class FrmMain extends JFrame {
 
         this.jMenuBar.add(jMenuOptions);
 
+        //Help menu
+        this.jMenuHelp = new JMenu("帮助");
+        this.jMenuItemAbout = new JMenuItem("关于");
+        jMenuItemAbout.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jMenuItemAboutActionPerformed(e);
+            }
+        });
+        this.jMenuHelp.add(jMenuItemAbout);
+
+        this.jMenuBar.add(jMenuHelp);
+
         this.setJMenuBar(jMenuBar);
 
         //Toolbar
@@ -155,7 +180,7 @@ public class FrmMain extends JFrame {
         jPanelToolBar.setLayout(new BorderLayout());
         this.jToolBar = new JToolBar();
         this.jButtonOpenFile = new JButton();
-        jButtonOpenFile.setIcon(new FlatSVGIcon("org/meteothink/weather/icons/file-open.svg"));
+        jButtonOpenFile.setIcon(new FlatSVGIcon("icons/file-open.svg"));
         jButtonOpenFile.setToolTipText("打开数据文件");
         jButtonOpenFile.addActionListener(new ActionListener() {
             @Override
@@ -175,16 +200,6 @@ public class FrmMain extends JFrame {
         });
         jToolBar.add(jComboBoxTimes);
         jPanelToolBar.add(jToolBar, BorderLayout.LINE_START);
-
-        //Main panel
-        /*this.jPanelMain = new JPanel();
-        this.jPanelMain.setLayout(new BorderLayout());
-        this.jPanelSetting = new JPanel();
-        this.jPanelMain.add(jPanelSetting, BorderLayout.WEST);
-        this.jPanelView = new JPanel();
-        this.jPanelMain.add(jPanelView, BorderLayout.EAST);
-        this.jPanelPlot = new ChartPanel();
-        this.jPanelMain.add(jPanelPlot);*/
 
         //Status panel
         this.jPanelStatus = new JPanel();
@@ -230,6 +245,12 @@ public class FrmMain extends JFrame {
         frm.setVisible(true);
     }
 
+    private void jMenuItemAboutActionPerformed(ActionEvent e) {
+        FrmAbout frmAbout = new FrmAbout(this, false);
+        frmAbout.setLocationRelativeTo(this);
+        frmAbout.setVisible(true);
+    }
+
     private void openFileActionPerformed(ActionEvent e) {
         String path = this.options.getCurrentPath();
         File pathDir = new File(path);
@@ -254,8 +275,10 @@ public class FrmMain extends JFrame {
     }
 
     private void setDataset(Dataset dataset) {
-        this.figureDockable.getPlot().setExtent(dataset.getExtent3D());
+        this.figureDockable.getPlot().setProjInfo(dataset.getDataInfo().getProjectionInfo());
+        //this.figureDockable.getPlot().setExtent(dataset.getExtent3D());
         this.figureDockable.getPlot().setDrawExtent(dataset.getExtent3D());
+        this.figureDockable.getPlot().setAxesExtent(dataset.getExtent3D());
         this.figureDockable.getPlot().setFixExtent(true);
         if (this.configDockable != null)
             this.configDockable.setDataset(dataset);

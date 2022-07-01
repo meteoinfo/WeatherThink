@@ -1,5 +1,6 @@
 package org.meteothink.weather.layer;
 
+import org.meteoinfo.chart.graphic.GraphicFactory;
 import org.meteoinfo.chart.graphic.VolumeGraphic;
 import org.meteoinfo.chart.jogl.JOGLUtil;
 import org.meteoinfo.chart.render.jogl.RayCastingType;
@@ -8,6 +9,7 @@ import org.meteoinfo.common.colors.ColorUtil;
 import org.meteoinfo.data.dimarray.DimArray;
 import org.meteoinfo.data.meteodata.Variable;
 import org.meteoinfo.geometry.colors.Normalize;
+import org.meteoinfo.geometry.colors.OpacityTransferFunction;
 import org.meteoinfo.geometry.colors.TransferFunction;
 import org.meteoinfo.geometry.graphic.Graphic;
 import org.meteoinfo.ndarray.math.ArrayMath;
@@ -81,7 +83,7 @@ public class VolumePanel extends LayerPanel {
             }
         });
 
-        //Color map
+        //Transfer function
         ColorMap ct = ColorUtil.findColorTable(colorMaps, "matlab_jet");
         if (this.data == null)
             transferFunctionPanel = new TransferFunctionPanel(null, ct, colorMaps);
@@ -306,10 +308,10 @@ public class VolumePanel extends LayerPanel {
     @Override
     public Graphic getGraphic() {
         ColorMap colorMap = this.transferFunctionPanel.getColorMap();
-        return createGraphic(colorMap, null);
+        return createGraphic(colorMap);
     }
 
-    private VolumeGraphic createGraphic(ColorMap colorMap, TransferFunction transferFunction) {
+    private VolumeGraphic createGraphic(ColorMap colorMap) {
         if (this.dataset == null) {
             return null;
         }
@@ -319,14 +321,28 @@ public class VolumePanel extends LayerPanel {
             readDataArray(varName);
         }
         Normalize normalize = new Normalize(this.minData, this.maxData, true);
-        if (transferFunction == null) {
-            List<Number> opacityLevels = new ArrayList<>();
-            opacityLevels.add(0.0f);
-            opacityLevels.add(1.0f);
-            transferFunction = new TransferFunction(null, opacityLevels, normalize);
+        List<Number> opacityLevels = new ArrayList<>();
+        opacityLevels.add(0.0f);
+        opacityLevels.add(1.0f);
+        OpacityTransferFunction otf = new OpacityTransferFunction(null, opacityLevels, normalize);
+        TransferFunction transferFunction = new TransferFunction(otf, colorMap, normalize);
+
+        graphic = (VolumeGraphic) GraphicFactory.volume(data.getArray(), data.getXDimension().getDimValue(),
+                data.getYDimension().getDimValue(), data.getZDimension().getDimValue(), transferFunction);
+        return graphic;
+    }
+
+    private VolumeGraphic createGraphic(TransferFunction transferFunction) {
+        if (this.dataset == null) {
+            return null;
         }
-        graphic = (VolumeGraphic) JOGLUtil.volume(data.getArray(), data.getXDimension().getDimValue(),
-                data.getYDimension().getDimValue(), data.getZDimension().getDimValue(), colorMap, normalize, transferFunction);
+
+        if (data == null) {
+            String varName = (String) this.jComboBoxVariable.getSelectedItem();
+            readDataArray(varName);
+        }
+        graphic = (VolumeGraphic) GraphicFactory.volume(data.getArray(), data.getXDimension().getDimValue(),
+                data.getYDimension().getDimValue(), data.getZDimension().getDimValue(), transferFunction);
         return graphic;
     }
 
@@ -352,7 +368,7 @@ public class VolumePanel extends LayerPanel {
                 String varName = (String) this.jComboBoxVariable.getSelectedItem();
                 readDataArray(varName);
                 ColorMap colorMap = this.transferFunctionPanel.getColorMap();
-                VolumeGraphic graphic = createGraphic(colorMap, null);
+                graphic = createGraphic(colorMap);
                 if (graphic != null) {
                     graphic.setRayCastingType((RayCastingType) this.jComboBoxRayCasting.getSelectedItem());
                     graphic.setBrightness(Float.valueOf(this.jSpinnerBrightness.getValue().toString()));
@@ -368,13 +384,12 @@ public class VolumePanel extends LayerPanel {
                 String varName = (String) this.jComboBoxVariable.getSelectedItem();
                 readDataArray(varName);
             }
-            ColorMap colorMap = this.transferFunctionPanel.getColorMap();
+
             TransferFunction transferFunction = this.transferFunctionPanel.getTransferFunction();
             if (graphic == null) {
-                graphic = createGraphic(colorMap, transferFunction);
+                graphic = createGraphic(transferFunction);
             }
             else {
-                graphic.setColorMap(colorMap);
                 graphic.setTransferFunction(transferFunction);
                 graphic.updateColors();
             }

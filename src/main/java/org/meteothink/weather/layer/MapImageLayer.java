@@ -1,6 +1,7 @@
 package org.meteothink.weather.layer;
 
 import org.meteoinfo.chart.graphic.GraphicCollection3D;
+import org.meteoinfo.chart.graphic.GraphicFactory;
 import org.meteoinfo.chart.jogl.JOGLUtil;
 import org.meteoinfo.chart.shape.TextureShape;
 import org.meteoinfo.geo.layer.ImageLayer;
@@ -25,7 +26,7 @@ public class MapImageLayer extends PlotLayer {
     @Override
     public void updateGraphic() {
         if (this.graphic == null) {
-            loadMapImage();
+            this.graphic = this.configPanel.getGraphic();
         }
     }
 
@@ -34,7 +35,7 @@ public class MapImageLayer extends PlotLayer {
         String fileName = startPath + File.separator + "data/map/world_topo.jpg";
         try {
             ImageLayer layer = (ImageLayer) MapDataManage.loadLayer(fileName);
-            this.graphic = JOGLUtil.createTexture(layer, 0, 0, null);
+            this.graphic = GraphicFactory.geoSurface(layer, 0, 0, 360, 180);
             ((GraphicCollection3D)this.graphic).setUsingLight(false);
             TextureShape shape = (TextureShape) ((GraphicCollection3D)this.graphic).get(0).getShape();
             shape.setXRepeat(2);

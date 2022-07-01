@@ -1,5 +1,7 @@
 package org.meteothink.weather.plot;
 
+import org.meteoinfo.geometry.colors.Normalize;
+import org.meteoinfo.geometry.colors.OpacityTransferFunction;
 import org.meteoinfo.geometry.colors.TransferFunction;
 import org.meteoinfo.common.colors.ColorMap;
 import org.meteoinfo.ndarray.Array;
@@ -14,10 +16,7 @@ import javax.swing.*;
 import javax.swing.event.EventListenerList;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.geom.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +42,8 @@ public class TransferFunctionPanel extends JPanel {
     private ControlPoint selectedPoint;
     private boolean isDraggingColorCP = false;
     private boolean isDraggingOpacityCP = false;
+    private boolean drawColorControlPoints = false;
+    private boolean isoValue = false;
 
     /**
      * Constructor
@@ -57,8 +58,20 @@ public class TransferFunctionPanel extends JPanel {
      * Constructor
      * @param data The data array
      * @param colorMap The color map
+     * @param colorMaps The color maps
      */
     public TransferFunctionPanel(Array data, ColorMap colorMap, ColorMap[] colorMaps) {
+        this(data, colorMap, colorMaps, null);
+    }
+
+    /**
+     * Constructor
+     * @param data The data array
+     * @param colorMap The color map
+     * @param colorMaps The color maps
+     * @param opacity The opacity
+     */
+    public TransferFunctionPanel(Array data, ColorMap colorMap, ColorMap[] colorMaps, Float opacity) {
         super();
         this.setPreferredSize(new Dimension(200, 120));
 
@@ -69,11 +82,94 @@ public class TransferFunctionPanel extends JPanel {
         colorControlPoints.add(new ControlPoint(0.f));
         colorControlPoints.add(new ControlPoint(1.f));
         updateControlPoints(colorControlPoints);
-        this.opacityControlPoints.add(new OpacityControlPoint(0.f));
-        this.opacityControlPoints.add(new OpacityControlPoint(0.33f));
-        this.opacityControlPoints.add(new OpacityControlPoint(0.67f));
-        this.opacityControlPoints.add(new OpacityControlPoint(1.0f));
+
+        if (opacity == null) {
+            this.opacityControlPoints.add(new OpacityControlPoint(0.f));
+            this.opacityControlPoints.add(new OpacityControlPoint(0.33f));
+            this.opacityControlPoints.add(new OpacityControlPoint(0.67f));
+            this.opacityControlPoints.add(new OpacityControlPoint(1.0f));
+        } else {
+            this.opacityControlPoints.add(new OpacityControlPoint(0.f, opacity));
+            this.opacityControlPoints.add(new OpacityControlPoint(0.33f, opacity));
+            this.opacityControlPoints.add(new OpacityControlPoint(0.67f, opacity));
+            this.opacityControlPoints.add(new OpacityControlPoint(1.0f, opacity));
+        }
         updateControlPoints(opacityControlPoints);
+
+        this.histogramColor = new Color(0, 204, 204);
+        this.xBorderGap = 4;
+        this.yBorderGap = 4;
+        this.colorMapHeight = 15;
+        this.histogramHeight = 80;
+        this.cmhistGap = 10;
+        this.pointSize = 8;
+        this.setBackground(new Color(40, 40, 40));
+        setData(data);
+        this.minValue = 0;
+        this.maxValue = 1;
+
+        this.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                onMouseClicked(e);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                mousePressPoint = new Point(e.getX(), e.getY());
+                selectedPoint = mouseSelectPoint(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (isDraggingColorCP) {
+                    updateControlPoints(colorControlPoints);
+                    isDraggingColorCP = false;
+                    fileTransferFunctionChangedEvent();
+                } else if (isDraggingOpacityCP) {
+                    updateControlPoints(opacityControlPoints);
+                    isDraggingOpacityCP = false;
+                    fileTransferFunctionChangedEvent();
+                }
+            }
+        });
+        this.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                onMouseDragged(e);
+            }
+        });
+    }
+
+    /**
+     * Constructor for iso value
+     * @param data The data array
+     */
+    public TransferFunctionPanel (Array data) {
+        this(data, 1.0f);
+    }
+
+    /**
+     * Constructor for iso value
+     * @param data The data array
+     * @param opacity The opacity
+     */
+    public TransferFunctionPanel (Array data, float opacity) {
+        super();
+        this.setPreferredSize(new Dimension(200, 120));
+
+        this.isoValue = true;
+        this.drawColorControlPoints = true;
+
+        colorControlPoints.add(new ControlPoint(0.5f));
+        updateControlPoints(colorControlPoints);
+
+        /*this.opacityControlPoints.add(new OpacityControlPoint(0.f, opacity));
+        this.opacityControlPoints.add(new OpacityControlPoint(0.33f, opacity));
+        this.opacityControlPoints.add(new OpacityControlPoint(0.67f, opacity));
+        this.opacityControlPoints.add(new OpacityControlPoint(1.0f, opacity));
+        updateControlPoints(opacityControlPoints);*/
+
         this.histogramColor = new Color(0, 204, 204);
         this.xBorderGap = 4;
         this.yBorderGap = 4;
@@ -223,15 +319,17 @@ public class TransferFunctionPanel extends JPanel {
     }
 
     private void updateControlPoints(List<? extends ControlPoint> cps) {
-        for (int i = 0; i < cps.size(); i++) {
-            ControlPoint cp = cps.get(i);
-            if (i == 0) {
-                cp.setMaxRatio(cps.get(i + 1).getRatio());
-            } else if (i == cps.size() - 1) {
-                cp.setMinRatio(cps.get(i - 1).getRatio());
-            } else {
-                cp.setMinRatio(cps.get(i - 1).getRatio());
-                cp.setMaxRatio(cps.get(i + 1).getRatio());
+        if (!this.isoValue) {
+            for (int i = 0; i < cps.size(); i++) {
+                ControlPoint cp = cps.get(i);
+                if (i == 0) {
+                    cp.setMaxRatio(cps.get(i + 1).getRatio());
+                } else if (i == cps.size() - 1) {
+                    cp.setMinRatio(cps.get(i - 1).getRatio());
+                } else {
+                    cp.setMinRatio(cps.get(i - 1).getRatio());
+                    cp.setMaxRatio(cps.get(i + 1).getRatio());
+                }
             }
         }
     }
@@ -250,25 +348,30 @@ public class TransferFunctionPanel extends JPanel {
         g2.setColor(this.getBackground());
         g2.fillRect(0, 0, this.getWidth(), this.getHeight());
 
-        //Draw color map
-        int n = this.colorMap.getColorCount();
-        float width = this.getWidth() - xBorderGap * 2;
-        float w = width / n;
-        if (w <= 0)
-            w = 1;
+        int n;
+        float x, y, w;
         float h = this.colorMapHeight;
-        float x = xBorderGap;
-        float y = this.getHeight() - h - yBorderGap;
-        Color c;
-        for (int i = 0; i < n; i++) {
-            c = this.colorMap.getColor(i);
-            g2.setColor(c);
-            if (i == 0)
-                g2.fill(new Rectangle2D.Float(x, y, w, h));
-            else
-                g2.fill(new Rectangle2D.Float(x - 1, y, w + 1, h));
+        float width = this.getWidth() - xBorderGap * 2;
 
-            x += w;
+        //Draw color map
+        if (!this.isoValue) {
+            n = this.colorMap.getColorCount();
+            w = width / n;
+            if (w <= 0)
+                w = 1;
+            x = xBorderGap;
+            y = this.getHeight() - h - yBorderGap;
+            Color c;
+            for (int i = 0; i < n; i++) {
+                c = this.colorMap.getColor(i);
+                g2.setColor(c);
+                if (i == 0)
+                    g2.fill(new Rectangle2D.Float(x, y, w, h));
+                else
+                    g2.fill(new Rectangle2D.Float(x - 1, y, w + 1, h));
+
+                x += w;
+            }
         }
 
         //Draw histogram
@@ -295,18 +398,25 @@ public class TransferFunctionPanel extends JPanel {
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_GASP);
 
         //Draw color control points
-        y = this.getHeight() - h - yBorderGap;
-        y = y + h / 2;
-        for (int i = 0; i < this.colorControlPoints.size(); i++) {
-            g2.setColor(Color.white);
-            ControlPoint cp = this.colorControlPoints.get(i);
-            x = xBorderGap + cp.getRatio() * width;
-            Ellipse2D ellipse = new Ellipse2D.Float(x - pointSize / 2, y - pointSize / 2, pointSize, pointSize);
-            cp.setLocation(x, y);
-            g2.fill(ellipse);
-            if (cp.isSelected()) {
-                g2.setColor(Color.black);
-                g2.fill(new Ellipse2D.Float(x - pointSize / 4, y - pointSize / 4, pointSize / 2, pointSize / 2));
+        if (this.drawColorControlPoints) {
+            y = this.getHeight() - h - yBorderGap;
+            y = y + h / 2;
+            for (int i = 0; i < this.colorControlPoints.size(); i++) {
+                g2.setColor(Color.white);
+                ControlPoint cp = this.colorControlPoints.get(i);
+                x = xBorderGap + cp.getRatio() * width;
+                Ellipse2D ellipse = new Ellipse2D.Float(x - pointSize / 2, y - pointSize / 2, pointSize, pointSize);
+                cp.setLocation(x, y);
+                g2.fill(ellipse);
+                if (cp.isSelected()) {
+                    g2.setColor(Color.black);
+                    g2.fill(new Ellipse2D.Float(x - pointSize / 4, y - pointSize / 4, pointSize / 2, pointSize / 2));
+                }
+                if (this.isoValue) {
+                    g2.setColor(Color.white);
+                    float ty = this.getHeight() - h - yBorderGap - height;
+                    g2.draw(new Line2D.Float(x, y, x, ty));
+                }
             }
         }
 
@@ -525,9 +635,13 @@ public class TransferFunctionPanel extends JPanel {
             opacityLevels[i] = opc.getOpacity();
         }
 
-        TransferFunction transferFunction = new TransferFunction();
-        transferFunction.setOpacityNodes(opacityNodes);
-        transferFunction.setOpacityLevels(opacityLevels);
+        OpacityTransferFunction opacityTransferFunction = new OpacityTransferFunction();
+        opacityTransferFunction.setOpacityNodes(opacityNodes);
+        opacityTransferFunction.setOpacityLevels(opacityLevels);
+
+        Normalize normalize = new Normalize(minValue, maxValue, true);
+
+        TransferFunction transferFunction = new TransferFunction(opacityTransferFunction, this.colorMap, normalize);
 
         return transferFunction;
     }

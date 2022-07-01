@@ -9,25 +9,15 @@ import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.action.CAction;
 import bibliothek.gui.dock.common.action.CButton;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
-import org.meteoinfo.chart.AspectType;
-import org.meteoinfo.chart.ChartPanel;
-import org.meteoinfo.chart.IChartPanel;
 import org.meteoinfo.chart.MouseMode;
 import org.meteoinfo.chart.jogl.GLChartPanel;
+import org.meteoinfo.chart.jogl.MapPlot3D;
 import org.meteoinfo.chart.jogl.Plot3DGL;
 import org.meteoinfo.chart.plot.GridLine;
-import org.meteoinfo.console.jython.PythonInteractiveInterpreter;
-import org.meteoinfo.ui.ButtonTabComponent;
 
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  *
@@ -38,15 +28,16 @@ public class FigureDockable extends DefaultSingleCDockable {
     private FrmMain parent;
     private GLChartPanel chartPanel;
     private boolean doubleBuffer;
+    public CButton buttonFullExtent;
 
     public FigureDockable(final FrmMain parent, String id, String title, CAction... actions) {
         super(id, title, actions);
 
         this.parent = parent;
         this.doubleBuffer = true;
-        this.setTitleIcon(new FlatSVGIcon("org/meteothink/weather/icons/figure.svg"));
+        this.setTitleIcon(new FlatSVGIcon("icons/figure_3d.svg"));
         chartPanel = new GLChartPanel();
-        Plot3DGL plot3DGL = new Plot3DGL();
+        Plot3DGL plot3DGL = new MapPlot3D();
         //plot3DGL.setAspectType(AspectType.XY_EQUAL);
         plot3DGL.setClipPlane(false);
         //plot3DGL.setOrthographic(false);
@@ -61,8 +52,9 @@ public class FigureDockable extends DefaultSingleCDockable {
         gridLine.setDrawZLine(false);
         plot3DGL.setDrawBoundingBox(true);
         plot3DGL.getLighting().setEnable(true);
+        plot3DGL.setAxesZoom(true);
         chartPanel.setPlot(plot3DGL);
-        chartPanel.setZoomXY(true);
+        //chartPanel.setZoomXY(true);
         this.getContentPane().add(chartPanel);
         //this.setCloseable(false);
 
@@ -70,8 +62,7 @@ public class FigureDockable extends DefaultSingleCDockable {
         //Select action
         CButton button = new CButton();
         button.setText("Select");
-        //button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Arrow.png")));
-        button.setIcon(new FlatSVGIcon("org/meteothink/weather/icons/select.svg"));
+        button.setIcon(new FlatSVGIcon("icons/select.svg"));
         button.setTooltip("Select");
         button.addActionListener(new ActionListener() {
             @Override
@@ -84,8 +75,7 @@ public class FigureDockable extends DefaultSingleCDockable {
         //Zoom in action
         button = new CButton();
         button.setText("Zoom In");
-        //button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/TSB_ZoomIn.Image.png")));
-        button.setIcon(new FlatSVGIcon("org/meteothink/weather/icons/zoom-in.svg"));
+        button.setIcon(new FlatSVGIcon("icons/zoom-in.svg"));
         button.setTooltip("Zoom In");
         button.addActionListener(new ActionListener() {
             @Override
@@ -98,7 +88,7 @@ public class FigureDockable extends DefaultSingleCDockable {
         button = new CButton();
         button.setText("Zoom Out");
         //button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/TSB_ZoomOut.Image.png")));
-        button.setIcon(new FlatSVGIcon("org/meteothink/weather/icons/zoom-out.svg"));
+        button.setIcon(new FlatSVGIcon("icons/zoom-out.svg"));
         button.setTooltip("Zoom Out");
         button.addActionListener(new ActionListener() {
             @Override
@@ -111,7 +101,7 @@ public class FigureDockable extends DefaultSingleCDockable {
         button = new CButton();
         button.setText("Pan");
         //button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/TSB_Pan.Image.png")));
-        button.setIcon(new FlatSVGIcon("org/meteothink/weather/icons/hand.svg"));
+        button.setIcon(new FlatSVGIcon("icons/hand.svg"));
         button.setTooltip("Pan");
         button.addActionListener(new ActionListener() {
             @Override
@@ -124,7 +114,7 @@ public class FigureDockable extends DefaultSingleCDockable {
         button = new CButton();
         button.setText("Rotate");
         //button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/rotate_16.png")));
-        button.setIcon(new FlatSVGIcon("org/meteothink/weather/icons/rotate_16.svg"));
+        button.setIcon(new FlatSVGIcon("icons/rotate_16.svg"));
         button.setTooltip("Rotate");
         button.addActionListener(new ActionListener() {
             @Override
@@ -134,24 +124,24 @@ public class FigureDockable extends DefaultSingleCDockable {
         });
         this.addAction(button);
         //Full extent action
-        button = new CButton();
-        button.setText("Full Extent");
+        buttonFullExtent = new CButton();
+        buttonFullExtent.setText("Full Extent");
         //button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/TSB_FullExtent.Image.png")));
-        button.setIcon(new FlatSVGIcon("org/meteothink/weather/icons/full-extent.svg"));
-        button.setTooltip("Full Extent");
-        button.addActionListener(new ActionListener() {
+        buttonFullExtent.setIcon(new FlatSVGIcon("icons/full-extent.svg"));
+        buttonFullExtent.setTooltip("Full Extent");
+        /*buttonFullExtent.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 chartPanel.onUndoZoomClick();
             }
-        });
-        this.addAction(button);
+        });*/
+        this.addAction(buttonFullExtent);
         this.addSeparator();
         //Identifer action
         button = new CButton();
         button.setText("Identifer");
         //button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/information.png")));
-        button.setIcon(new FlatSVGIcon("org/meteothink/weather/icons/information.svg"));
+        button.setIcon(new FlatSVGIcon("icons/information.svg"));
         button.setTooltip("Identifer");
         button.addActionListener(new ActionListener() {
             @Override
