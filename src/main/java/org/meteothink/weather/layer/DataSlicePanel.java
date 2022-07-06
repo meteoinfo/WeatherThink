@@ -31,8 +31,9 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SlicePanel extends LayerPanel implements ItemListener {
+public class DataSlicePanel extends LayerPanel implements ItemListener {
 
+    final java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("bundle/RenderDockable");
     JLabel jLabelVariable;
     JComboBox jComboBoxVariable;
     TransferFunctionPanel transferFunctionPanel;
@@ -65,10 +66,10 @@ public class SlicePanel extends LayerPanel implements ItemListener {
      * @param layer The plot layer
      * @param colorMaps The color maps
      */
-    public SlicePanel(PlotLayer layer, ColorMap[] colorMaps) {
+    public DataSlicePanel(PlotLayer layer, ColorMap[] colorMaps) {
         super(layer, colorMaps);
 
-        Border border = BorderFactory.createTitledBorder("数据切片设置");
+        Border border = BorderFactory.createTitledBorder(bundle.getString("RenderDockable.dataSlicePanel.border.title"));
         this.setBorder(border);
 
         initComponents();
@@ -76,7 +77,7 @@ public class SlicePanel extends LayerPanel implements ItemListener {
 
     private void initComponents() {
         //Variable
-        this.jLabelVariable = new JLabel("变量:");
+        this.jLabelVariable = new JLabel(bundle.getString("RenderDockable.variable"));
         this.jComboBoxVariable = new JComboBox();
         jComboBoxVariable.addItemListener(new ItemListener() {
             @Override
@@ -146,9 +147,9 @@ public class SlicePanel extends LayerPanel implements ItemListener {
             }
         });
 
-        jLabelDataValue = new JLabel("数据值:");
+        jLabelDataValue = new JLabel(bundle.getString("RenderDockable.dataValue"));
         jTextFieldDataValue = new JTextField(5);
-        jLabelOpacity = new JLabel("不透明度:");
+        jLabelOpacity = new JLabel(bundle.getString("RenderDockable.opacity"));
         jTextFieldOpacity = new JTextField(5);
         jLabelDataValue.setEnabled(false);
         jTextFieldDataValue.setEnabled(false);
@@ -210,7 +211,7 @@ public class SlicePanel extends LayerPanel implements ItemListener {
         });
 
         //Slice direction
-        jLabelSliceXYZ = new JLabel("切片方向:");
+        jLabelSliceXYZ = new JLabel(bundle.getString("RenderDockable.dataSlicePanel.jLabelSliceXYZ"));
         buttonGroupXYZ = new ButtonGroup();
         jRadioButtonX = new JRadioButton("X", true);
         jRadioButtonY = new JRadioButton("Y");

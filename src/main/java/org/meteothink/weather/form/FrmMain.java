@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 public class FrmMain extends JFrame {
 
+    final java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("bundle/FrmMain");
     private JMenuBar jMenuBar;
     private JMenu jMenuFile;
     private JMenuItem jMenuItemFileOpen;
@@ -38,7 +39,7 @@ public class FrmMain extends JFrame {
     private JButton jButtonOpenFile;
     private JComboBox jComboBoxTimes;
 
-    private RenderDockable configDockable;
+    private RenderDockable renderDockable;
     private FigureDockable figureDockable;
 
     private JPanel jPanelStatus;
@@ -69,7 +70,7 @@ public class FrmMain extends JFrame {
         this.setIconImages(FlatSVGUtils.createWindowIconImages("/icons/rainstorm.svg"));
 
         //Title
-        this.setTitle("灾害天气分析与可视化系统");
+        this.setTitle(bundle.getString("FrmMain.title"));
     }
 
     /**
@@ -99,7 +100,7 @@ public class FrmMain extends JFrame {
         System.out.println("Editor and Console panels...");
         CGrid grid = new CGrid(control);
 
-        figureDockable = new FigureDockable(this, this.startupPath, "图形");
+        figureDockable = new FigureDockable(this, this.startupPath, bundle.getString("FrmMain.figureDockable.title"));
         figureDockable.buttonFullExtent.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -109,8 +110,8 @@ public class FrmMain extends JFrame {
                 }
             }
         });
-        configDockable = new RenderDockable(this, "Configure", this.startupPath);
-        grid.add(0, 0, 3, 10, configDockable);
+        renderDockable = new RenderDockable(this, "Configure", this.startupPath);
+        grid.add(0, 0, 3, 10, renderDockable);
         grid.add(3, 0, 7, 10, figureDockable);
         control.getContentArea().deploy(grid);
 
@@ -123,15 +124,15 @@ public class FrmMain extends JFrame {
         //Menu
         //File menu
         this.jMenuBar = new JMenuBar();
-        this.jMenuFile = new JMenu("文件");
-        this.jMenuItemFileOpen = new JMenuItem("打开");
+        this.jMenuFile = new JMenu(bundle.getString("FrmMain.jMenuFile.text"));
+        this.jMenuItemFileOpen = new JMenuItem(bundle.getString("FrmMain.jMenuItemFileOpen.text"));
         jMenuItemFileOpen.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 openFileActionPerformed(e);
             }
         });
-        this.jMenuItemExit = new JMenuItem("退出");
+        this.jMenuItemExit = new JMenuItem(bundle.getString("FrmMain.jMenuItemExit.text"));
 
         this.jMenuFile.setMnemonic(KeyEvent.VK_F);
         this.jMenuItemFileOpen.setMnemonic(KeyEvent.VK_O);
@@ -147,8 +148,8 @@ public class FrmMain extends JFrame {
         this.jMenuBar.add(jMenuFile);
 
         //Options menu
-        this.jMenuOptions = new JMenu("选项");
-        this.jMenuItemSetting = new JMenuItem("设置");
+        this.jMenuOptions = new JMenu(bundle.getString("FrmMain.jMenuOptions.text"));
+        this.jMenuItemSetting = new JMenuItem(bundle.getString("FrmMain.jMenuItemSetting.text"));
         jMenuItemSetting.setIcon(new FlatSVGIcon("icons/gear.svg"));
         jMenuItemSetting.addActionListener(new ActionListener() {
             @Override
@@ -161,8 +162,8 @@ public class FrmMain extends JFrame {
         this.jMenuBar.add(jMenuOptions);
 
         //Help menu
-        this.jMenuHelp = new JMenu("帮助");
-        this.jMenuItemAbout = new JMenuItem("关于");
+        this.jMenuHelp = new JMenu(bundle.getString("FrmMain.jMenuHelp.text"));
+        this.jMenuItemAbout = new JMenuItem(bundle.getString("FrmMain.jMenuItemAbout.text"));
         jMenuItemAbout.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -181,7 +182,7 @@ public class FrmMain extends JFrame {
         this.jToolBar = new JToolBar();
         this.jButtonOpenFile = new JButton();
         jButtonOpenFile.setIcon(new FlatSVGIcon("icons/file-open.svg"));
-        jButtonOpenFile.setToolTipText("打开数据文件");
+        jButtonOpenFile.setToolTipText(bundle.getString("FrmMain.jButtonOpenFile.toolTipText"));
         jButtonOpenFile.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -204,7 +205,7 @@ public class FrmMain extends JFrame {
         //Status panel
         this.jPanelStatus = new JPanel();
         this.jPanelStatus.setLayout(new BorderLayout());
-        this.jLabelInstitute = new JLabel("灾害天气国家重点实验室");
+        this.jLabelInstitute = new JLabel(bundle.getString("FrmMain.jLabelInstitute.text"));
         this.jPanelStatus.add(jLabelInstitute, BorderLayout.WEST);
 
         this.jProgressBarRun = new JProgressBar();
@@ -280,8 +281,8 @@ public class FrmMain extends JFrame {
         this.figureDockable.getPlot().setDrawExtent(dataset.getExtent3D());
         this.figureDockable.getPlot().setAxesExtent(dataset.getExtent3D());
         this.figureDockable.getPlot().setFixExtent(true);
-        if (this.configDockable != null)
-            this.configDockable.setDataset(dataset);
+        if (this.renderDockable != null)
+            this.renderDockable.setDataset(dataset);
 
         this.jComboBoxTimes.setVisible(true);
         DateTimeFormatter sdf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -340,11 +341,11 @@ public class FrmMain extends JFrame {
     }
 
     /**
-     * Get config dockable
-     * @return Config dockable
+     * Get render dockable
+     * @return Render dockable
      */
-    public RenderDockable getConfigDockable() {
-        return this.configDockable;
+    public RenderDockable getRenderDockable() {
+        return this.renderDockable;
     }
 
     private void onTimeChanged(ItemEvent e) {

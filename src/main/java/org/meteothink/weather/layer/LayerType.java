@@ -1,45 +1,48 @@
 package org.meteothink.weather.layer;
 
 public enum LayerType {
+
     MAP_IMAGE {
-        public String getNameCN() {
-            return "地图图像";
+        public String getName() {
+            return bundle.getString("RenderDockable.layer.MAP_IMAGE.name");
         }
     },
     MAP_VECTOR {
-        public String getNameCN() {
-            return "地图矢量";
+        public String getName() {
+            return bundle.getString("RenderDockable.layer.MAP_VECTOR.name");
         }
     },
     SLICE {
-        public String getNameCN() {
-            return "数据切片";
+        public String getName() {
+            return bundle.getString("RenderDockable.layer.SLICE.name");
         }
     },
     VOLUME {
-        public String getNameCN() {
-            return "体绘制";
+        public String getName() {
+            return bundle.getString("RenderDockable.layer.VOLUME.name");
         }
     },
     ISO_SURFACE {
-        public String getNameCN() {
-            return "等值面";
+        public String getName() {
+            return bundle.getString("RenderDockable.layer.ISO_SURFACE.name");
         }
     },
     STREAMLINE {
-        public String getNameCN() {
-            return "流线";
+        public String getName() {
+            return bundle.getString("RenderDockable.layer.STREAMLINE.name");
         }
     },
     WIND_VECTOR {
-        public String getNameCN() {
-            return "风场矢量";
+        public String getName() {
+            return bundle.getString("RenderDockable.layer.WIND_VECTOR.name");
         }
     };
 
-    public abstract String getNameCN();
+    final java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("bundle/RenderDockable");
+
+    public abstract String getName();
 
     public String toString() {
-        return getNameCN();
+        return getName();
     }
 }

@@ -19,6 +19,8 @@ import java.util.logging.Logger;
  */
 public class FrmAbout extends javax.swing.JDialog {
 
+    final java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("bundle/FrmAbout");
+
     /**
      * Creates new form frmAbout
      * @param parent
@@ -27,7 +29,7 @@ public class FrmAbout extends javax.swing.JDialog {
     public FrmAbout(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        this.setTitle("About");
+        this.setTitle(bundle.getString("FrmAbout.title"));
         this.jLabel_version.setText("0.1");
         this.jLabel_web.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }
@@ -41,48 +43,48 @@ public class FrmAbout extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
+        jLabelIcon = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
+        jLabelName = new javax.swing.JLabel();
+        jLabelLongName = new javax.swing.JLabel();
+        jLabelVersion = new javax.swing.JLabel();
+        jLabelAuthor = new javax.swing.JLabel();
+        jLabelAuthorName = new javax.swing.JLabel();
         jLabel_version = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
+        jLabelSponsor = new javax.swing.JLabel();
+        jLabelSponsorName = new javax.swing.JLabel();
+        jLabelHomepage = new javax.swing.JLabel();
         jLabel_web = new javax.swing.JLabel();
         jButton_Close = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/wt_logo.jpg"))); // NOI18N
+        jLabelIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/wt_logo.jpg"))); // NOI18N
 
         //jLabel2.setFont(new java.awt.Font("Courier", 1, 18)); // NOI18N
-        jLabel2.setText("WeatherThink");
+        jLabelName.setText(bundle.getString("FrmAbout.jLabelName.text"));
 
         //jLabel3.setFont(new java.awt.Font("Courier", 0, 14)); // NOI18N
-        jLabel3.setText("Severe Weather Analysis and Visualization System");
+        jLabelLongName.setText(bundle.getString("FrmAbout.jLabelLongName.text"));
 
         //jLabel4.setFont(new java.awt.Font("Courier", 1, 15)); // NOI18N
-        jLabel4.setText("Version:");
+        jLabelVersion.setText(bundle.getString("FrmAbout.jLabelVersion.text"));
 
         //jLabel5.setFont(new java.awt.Font("Courier", 1, 15)); // NOI18N
-        jLabel5.setText("Author:");
+        jLabelAuthor.setText(bundle.getString("FrmAbout.jLabelAuthor.text"));
 
-        jLabel6.setText("Yaqiang Wang");
+        jLabelAuthorName.setText(bundle.getString("FrmAbout.jLabelAuthorName.text"));
 
         jLabel_version.setText("...");
 
         //jLabel8.setFont(new java.awt.Font("Courier", 1, 15)); // NOI18N
-        jLabel8.setText("Sponsor:");
+        jLabelSponsor.setText(bundle.getString("FrmAbout.jLabelSponsor.text"));
 
-        jLabel9.setText("State Key Laboratory of Severe Weather");
+        jLabelSponsorName.setText(bundle.getString("FrmAbout.jLabelSponsorName.text"));
 
         //jLabel10.setFont(new java.awt.Font("Courier", 1, 15)); // NOI18N
-        jLabel10.setText("Homepage:");
+        jLabelHomepage.setText(bundle.getString("FrmAbout.jLabelHomepage.text"));
 
         jLabel_web.setForeground(new java.awt.Color(0, 153, 204));
         jLabel_web.setText("http://www.meteothink.org");
@@ -100,53 +102,53 @@ public class FrmAbout extends javax.swing.JDialog {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(1, 1, 1)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel3)
+                    .addComponent(jLabelLongName)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel4)
+                        .addComponent(jLabelVersion)
                         .addGap(18, 18, 18)
                         .addComponent(jLabel_version))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel5)
-                            .addComponent(jLabel8)
-                            .addComponent(jLabel10))
+                            .addComponent(jLabelAuthor)
+                            .addComponent(jLabelSponsor)
+                            .addComponent(jLabelHomepage))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel_web)
-                            .addComponent(jLabel9)
-                            .addComponent(jLabel6)))
+                            .addComponent(jLabelSponsorName)
+                            .addComponent(jLabelAuthorName)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(66, 66, 66)
-                        .addComponent(jLabel2)))
+                        .addComponent(jLabelName)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(6, 6, 6)
-                .addComponent(jLabel2)
+                .addComponent(jLabelName)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel3)
+                .addComponent(jLabelLongName)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
+                    .addComponent(jLabelVersion)
                     .addComponent(jLabel_version))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel6))
+                    .addComponent(jLabelAuthor)
+                    .addComponent(jLabelAuthorName))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel8)
-                    .addComponent(jLabel9))
+                    .addComponent(jLabelSponsor)
+                    .addComponent(jLabelSponsorName))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel10)
+                    .addComponent(jLabelHomepage)
                     .addComponent(jLabel_web))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jButton_Close.setText("Close");
+        jButton_Close.setText(bundle.getString("FrmAbout.jButtonClose.text"));
         jButton_Close.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton_CloseActionPerformed(evt);
@@ -158,7 +160,7 @@ public class FrmAbout extends javax.swing.JDialog {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jLabel1)
+                .addComponent(jLabelIcon)
                 .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -173,7 +175,7 @@ public class FrmAbout extends javax.swing.JDialog {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jLabel1)
+                .addComponent(jLabelIcon)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -253,15 +255,15 @@ public class FrmAbout extends javax.swing.JDialog {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton_Close;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
+    private javax.swing.JLabel jLabelIcon;
+    private javax.swing.JLabel jLabelHomepage;
+    private javax.swing.JLabel jLabelName;
+    private javax.swing.JLabel jLabelLongName;
+    private javax.swing.JLabel jLabelVersion;
+    private javax.swing.JLabel jLabelAuthor;
+    private javax.swing.JLabel jLabelAuthorName;
+    private javax.swing.JLabel jLabelSponsor;
+    private javax.swing.JLabel jLabelSponsorName;
     private javax.swing.JLabel jLabel_version;
     private javax.swing.JLabel jLabel_web;
     private javax.swing.JPanel jPanel1;

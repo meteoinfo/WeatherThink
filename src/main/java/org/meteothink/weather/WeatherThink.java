@@ -13,6 +13,7 @@ import javax.swing.*;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -92,6 +93,24 @@ public class WeatherThink {
             if (options.isLafDecorated()) {
                 JFrame.setDefaultLookAndFeelDecorated(true);
                 JDialog.setDefaultLookAndFeelDecorated(true);
+            }
+        }
+
+        if (args.length >= 1) {
+            if (args[0].startsWith("-local:")) {
+                String locale = args[0].substring(7);
+                switch (locale.toLowerCase()) {
+                    case "eng":
+                    case "en":
+                    case "english":
+                        Locale.setDefault(Locale.ENGLISH);
+                        break;
+                    case "zh":
+                    case "cn":
+                    case "chinese":
+                        Locale.setDefault(Locale.CHINESE);
+                        break;
+                }
             }
         }
 

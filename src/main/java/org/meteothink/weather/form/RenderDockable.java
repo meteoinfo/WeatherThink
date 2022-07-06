@@ -30,6 +30,7 @@ import java.util.List;
 
 public class RenderDockable extends DefaultSingleCDockable {
 
+    final java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("bundle/RenderDockable");
     private JPanel jPanelLayers;
     private JScrollPane jScrollPaneLayers;
     private JCheckBoxList jCheckBoxListLayers;
@@ -104,7 +105,7 @@ public class RenderDockable extends DefaultSingleCDockable {
                 onLayerSelected(e);
             }
         });
-        Border border = BorderFactory.createTitledBorder("图层");
+        Border border = BorderFactory.createTitledBorder(bundle.getString("RenderDockable.layerBorder.title"));
         jScrollPaneLayers.setBorder(border);
         jScrollPaneLayers.setViewportView(jCheckBoxListLayers);
         this.getContentPane().add(jScrollPaneLayers, BorderLayout.NORTH);

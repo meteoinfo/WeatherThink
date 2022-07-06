@@ -3,5 +3,5 @@
   <Path OpenPath="D:\Temp\LaSW\data"/>
   <LookFeel LafDecorated="true" Name="FlatDarkLaf"/>
   <Figure DoubleBuffering="true"/>
-  <Startup MainFormLocation="-5,1" MainFormSize="1293,685"/>
+  <Startup MainFormLocation="-7,-7" MainFormSize="1293,685"/>
 </MeteoInfo>

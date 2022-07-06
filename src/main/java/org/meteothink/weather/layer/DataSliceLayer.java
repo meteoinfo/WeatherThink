@@ -2,13 +2,13 @@ package org.meteothink.weather.layer;
 
 import org.meteoinfo.common.colors.ColorMap;
 
-public class SliceLayer extends PlotLayer {
+public class DataSliceLayer extends PlotLayer {
 
     /**
      * Constructor
      */
-    public SliceLayer(ColorMap[] colorMaps) {
-        this.configPanel = new SlicePanel(this, colorMaps);
+    public DataSliceLayer(ColorMap[] colorMaps) {
+        this.configPanel = new DataSlicePanel(this, colorMaps);
     }
 
     @Override

@@ -34,7 +34,7 @@ public abstract class PlotLayer {
             case MAP_VECTOR:
                 return new MapVectorLayer();
             case SLICE:
-                return new SliceLayer(colorMaps);
+                return new DataSliceLayer(colorMaps);
             case ISO_SURFACE:
                 return new IsoSurfaceLayer();
             case VOLUME:

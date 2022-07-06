@@ -24,6 +24,7 @@ import java.util.List;
 
 public class IsoSurfacePanel extends LayerPanel {
 
+    final java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("bundle/RenderDockable");
     JLabel jLabelVariable;
     JComboBox jComboBoxVariable;
     TransferFunctionPanel transferFunctionPanel;
@@ -49,7 +50,7 @@ public class IsoSurfacePanel extends LayerPanel {
     public IsoSurfacePanel(PlotLayer layer) {
         super(layer);
 
-        Border border = BorderFactory.createTitledBorder("等值面设置");
+        Border border = BorderFactory.createTitledBorder(bundle.getString("RenderDockable.isoSurfacePanel.border.title"));
         this.setBorder(border);
 
         initComponents();
@@ -57,7 +58,7 @@ public class IsoSurfacePanel extends LayerPanel {
 
     private void initComponents() {
         //Variable
-        this.jLabelVariable = new JLabel("变量:");
+        this.jLabelVariable = new JLabel(bundle.getString("RenderDockable.variable"));
         this.jComboBoxVariable = new JComboBox();
         jComboBoxVariable.addItemListener(new ItemListener() {
             @Override
@@ -117,7 +118,7 @@ public class IsoSurfacePanel extends LayerPanel {
         });
 
         //Value
-        this.jLabelValue = new JLabel("等值面值:");
+        this.jLabelValue = new JLabel(bundle.getString("RenderDockable.isoSurfacePanel.jLabelValue.text"));
         this.jTextFieldValue = new JTextField(10);
         jTextFieldValue.addKeyListener(new KeyAdapter() {
             @Override
@@ -129,7 +130,7 @@ public class IsoSurfacePanel extends LayerPanel {
         });
 
         //Color
-        jLabelColor = new JLabel("颜色:");
+        jLabelColor = new JLabel(bundle.getString("RenderDockable.color"));
         jLabelColorView = new JLabel();
         jLabelColorView.setOpaque(true);
         jLabelColorView.setBackground(Color.white);
@@ -141,7 +142,7 @@ public class IsoSurfacePanel extends LayerPanel {
             }
         });
 
-        jLabelOpacity = new JLabel("不透明度:");
+        jLabelOpacity = new JLabel(bundle.getString("RenderDockable.opacity"));
         jSliderOpacity = new JSlider();
         jSliderOpacity.setValue(100);
         jSliderOpacity.addChangeListener(new ChangeListener() {

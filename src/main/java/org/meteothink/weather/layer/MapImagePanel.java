@@ -18,6 +18,7 @@ import java.util.List;
 
 public class MapImagePanel extends LayerPanel {
 
+    final java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("bundle/RenderDockable");
     JLabel jLabelImage;
     JComboBox jComboBoxImage;
     String mapPath;
@@ -29,14 +30,14 @@ public class MapImagePanel extends LayerPanel {
      */
     public MapImagePanel(PlotLayer layer) {
         super(layer);
-        Border border = BorderFactory.createTitledBorder("地图图像设置");
+        Border border = BorderFactory.createTitledBorder(bundle.getString("RenderDockable.mapImagePanel.border.title"));
         this.setBorder(border);
 
         initComponents();
     }
 
     private void initComponents() {
-        jLabelImage = new JLabel("图像文件:");
+        jLabelImage = new JLabel(bundle.getString("RenderDockable.mapImagePanel.jLabelImage.text"));
         jComboBoxImage = new JComboBox();
 
         mapPath = System.getProperty("user.dir");

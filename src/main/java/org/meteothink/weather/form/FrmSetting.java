@@ -24,7 +24,8 @@ import java.util.logging.Logger;
  * @author yaqiang
  */
 public class FrmSetting extends javax.swing.JDialog {
-    
+
+    final java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("bundle/FrmSetting");
     private FrmMain parent;
 
     /**
@@ -75,9 +76,9 @@ public class FrmSetting extends javax.swing.JDialog {
         jButton_Apply = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("设置");
+        setTitle(bundle.getString("FrmSetting.title"));
 
-        jLabel_LookFeel.setText("Look&Feel: ");
+        jLabel_LookFeel.setText(bundle.getString("FrmSetting.jLabelLookFeel.text"));
 
         jComboBox_LookFeel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -85,11 +86,11 @@ public class FrmSetting extends javax.swing.JDialog {
             }
         });
 
-        jCheckBox_LafDecorated.setText("Laf decorated");
+        jCheckBox_LafDecorated.setText(bundle.getString("FrmSetting.jCheckBoxLafDecorated.text"));
 
-        jCheckBox_DockWindowDecorated.setText("Dock window decorated");
+        jCheckBox_DockWindowDecorated.setText(bundle.getString("FrmSetting.jCheckBoxDockWindowDecorated.text"));
 
-        jLabel1.setText("(Needs restart)");
+        jLabel1.setText(bundle.getString("FrmSetting.jLabelRestart.text"));
 
         javax.swing.GroupLayout jPanel_AppearanceLayout = new javax.swing.GroupLayout(jPanel_Appearance);
         jPanel_Appearance.setLayout(jPanel_AppearanceLayout);
@@ -130,7 +131,7 @@ public class FrmSetting extends javax.swing.JDialog {
                 .addContainerGap(22, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("Appearance", jPanel_Appearance);
+        jTabbedPane1.addTab(bundle.getString("FrmSetting.jTabPanelAppearance.title"), jPanel_Appearance);
 
         /*jCheckBox_DoubleBuffering.setText("Double Buffering");
 

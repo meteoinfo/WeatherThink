@@ -32,6 +32,7 @@ import java.util.List;
 
 public class VolumePanel extends LayerPanel {
 
+    final java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("bundle/RenderDockable");
     JLabel jLabelVariable;
     JComboBox jComboBoxVariable;
     TransferFunctionPanel transferFunctionPanel;
@@ -65,7 +66,7 @@ public class VolumePanel extends LayerPanel {
     public VolumePanel(PlotLayer layer, ColorMap[] colorMaps) {
         super(layer, colorMaps);
 
-        Border border = BorderFactory.createTitledBorder("体绘制设置");
+        Border border = BorderFactory.createTitledBorder(bundle.getString("RenderDockable.volumePanel.border.title"));
         this.setBorder(border);
 
         initComponents();
@@ -73,7 +74,7 @@ public class VolumePanel extends LayerPanel {
 
     private void initComponents() {
         //Variable
-        this.jLabelVariable = new JLabel("变量:");
+        this.jLabelVariable = new JLabel(bundle.getString("RenderDockable.variable"));
         this.jComboBoxVariable = new JComboBox();
         this.jComboBoxVariable.setPreferredSize(new Dimension(200, 20));
         jComboBoxVariable.addItemListener(new ItemListener() {
@@ -144,9 +145,9 @@ public class VolumePanel extends LayerPanel {
             }
         });
 
-        jLabelDataValue = new JLabel("数据值:");
+        jLabelDataValue = new JLabel(bundle.getString("RenderDockable.dataValue"));
         jTextFieldDataValue = new JTextField(5);
-        jLabelOpacity = new JLabel("不透明度:");
+        jLabelOpacity = new JLabel(bundle.getString("RenderDockable.opacity"));
         jTextFieldOpacity = new JTextField(5);
         jLabelDataValue.setEnabled(false);
         jTextFieldDataValue.setEnabled(false);
@@ -208,7 +209,7 @@ public class VolumePanel extends LayerPanel {
         });
 
         //Ray casting
-        jLabelRayCasting = new JLabel("光线投影:");
+        jLabelRayCasting = new JLabel(bundle.getString("RenderDockable.volumePanel.jLabelRayCasting.text"));
         jComboBoxRayCasting = new JComboBox();
         for (RayCastingType rayCastingType : RayCastingType.values()) {
             jComboBoxRayCasting.addItem(rayCastingType);
@@ -222,7 +223,7 @@ public class VolumePanel extends LayerPanel {
         });
 
         //Brightness
-        jLabelBrightness = new JLabel("亮度:");
+        jLabelBrightness = new JLabel(bundle.getString("RnderDockable.brightness"));
         SpinnerModel spinnerModel = new SpinnerNumberModel(1.0f, 0.0f, 2.0f, 0.1f);
         jSpinnerBrightness = new JSpinner(spinnerModel);
         jSpinnerBrightness.addChangeListener(new ChangeListener() {
