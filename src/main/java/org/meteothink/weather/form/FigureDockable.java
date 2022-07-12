@@ -9,6 +9,7 @@ import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.action.CAction;
 import bibliothek.gui.dock.common.action.CButton;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
+import org.meteoinfo.chart.AspectType;
 import org.meteoinfo.chart.MouseMode;
 import org.meteoinfo.chart.jogl.GLChartPanel;
 import org.meteoinfo.chart.jogl.MapPlot3D;
@@ -38,9 +39,9 @@ public class FigureDockable extends DefaultSingleCDockable {
         this.setTitleIcon(new FlatSVGIcon("icons/figure_3d.svg"));
         chartPanel = new GLChartPanel();
         Plot3DGL plot3DGL = new MapPlot3D();
-        //plot3DGL.setAspectType(AspectType.XY_EQUAL);
+        plot3DGL.setAspectType(AspectType.XY_EQUAL);
         plot3DGL.setClipPlane(false);
-        //plot3DGL.setOrthographic(false);
+        plot3DGL.setOrthographic(false);
         plot3DGL.setBackground(Color.black);
         plot3DGL.setDrawBase(true);
         plot3DGL.setBoxed(true);
@@ -53,6 +54,7 @@ public class FigureDockable extends DefaultSingleCDockable {
         plot3DGL.setDrawBoundingBox(true);
         plot3DGL.getLighting().setEnable(true);
         plot3DGL.setAxesZoom(true);
+        plot3DGL.setZScale(0.5f);
         chartPanel.setPlot(plot3DGL);
         //chartPanel.setZoomXY(true);
         this.getContentPane().add(chartPanel);

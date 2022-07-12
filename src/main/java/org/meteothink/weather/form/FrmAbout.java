@@ -97,6 +97,8 @@ public class FrmAbout extends javax.swing.JDialog {
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setAutoCreateGaps(true);
+        jPanel1Layout.setAutoCreateContainerGaps(true);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
@@ -118,7 +120,6 @@ public class FrmAbout extends javax.swing.JDialog {
                             .addComponent(jLabelSponsorName)
                             .addComponent(jLabelAuthorName)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(66, 66, 66)
                         .addComponent(jLabelName)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );

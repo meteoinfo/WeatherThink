@@ -72,6 +72,18 @@ public class TransferFunctionPanel extends JPanel {
      * @param opacity The opacity
      */
     public TransferFunctionPanel(Array data, ColorMap colorMap, ColorMap[] colorMaps, Float opacity) {
+        this(data, colorMap, colorMaps, opacity, 4);
+    }
+
+    /**
+     * Constructor
+     * @param data The data array
+     * @param colorMap The color map
+     * @param colorMaps The color maps
+     * @param opacity The opacity
+     * @param opacityCPNumber Opacity control point number
+     */
+    public TransferFunctionPanel(Array data, ColorMap colorMap, ColorMap[] colorMaps, Float opacity, int opacityCPNumber) {
         super();
         this.setPreferredSize(new Dimension(200, 120));
 
@@ -84,15 +96,21 @@ public class TransferFunctionPanel extends JPanel {
         updateControlPoints(colorControlPoints);
 
         if (opacity == null) {
-            this.opacityControlPoints.add(new OpacityControlPoint(0.f));
-            this.opacityControlPoints.add(new OpacityControlPoint(0.33f));
-            this.opacityControlPoints.add(new OpacityControlPoint(0.67f));
-            this.opacityControlPoints.add(new OpacityControlPoint(1.0f));
+            if (opacityCPNumber > 1) {
+                for (int i = 0; i < opacityCPNumber; i++) {
+                    this.opacityControlPoints.add(new OpacityControlPoint(1.0f * i / (opacityCPNumber - 1)));
+                }
+            } else {
+                this.opacityControlPoints.add(new OpacityControlPoint(0.5f));
+            }
         } else {
-            this.opacityControlPoints.add(new OpacityControlPoint(0.f, opacity));
-            this.opacityControlPoints.add(new OpacityControlPoint(0.33f, opacity));
-            this.opacityControlPoints.add(new OpacityControlPoint(0.67f, opacity));
-            this.opacityControlPoints.add(new OpacityControlPoint(1.0f, opacity));
+            if (opacityCPNumber > 1) {
+                for (int i = 0; i < opacityCPNumber; i++) {
+                    this.opacityControlPoints.add(new OpacityControlPoint(1.0f * i / (opacityCPNumber - 1), opacity));
+                }
+            } else {
+                this.opacityControlPoints.add(new OpacityControlPoint(0.5f, opacity));
+            }
         }
         updateControlPoints(opacityControlPoints);
 
@@ -320,15 +338,21 @@ public class TransferFunctionPanel extends JPanel {
 
     private void updateControlPoints(List<? extends ControlPoint> cps) {
         if (!this.isoValue) {
-            for (int i = 0; i < cps.size(); i++) {
-                ControlPoint cp = cps.get(i);
-                if (i == 0) {
-                    cp.setMaxRatio(cps.get(i + 1).getRatio());
-                } else if (i == cps.size() - 1) {
-                    cp.setMinRatio(cps.get(i - 1).getRatio());
-                } else {
-                    cp.setMinRatio(cps.get(i - 1).getRatio());
-                    cp.setMaxRatio(cps.get(i + 1).getRatio());
+            if (cps.size() == 1) {
+                ControlPoint cp = cps.get(0);
+                cp.setMinRatio(0);
+                cp.setMaxRatio(1);
+            } else {
+                for (int i = 0; i < cps.size(); i++) {
+                    ControlPoint cp = cps.get(i);
+                    if (i == 0) {
+                        cp.setMaxRatio(cps.get(i + 1).getRatio());
+                    } else if (i == cps.size() - 1) {
+                        cp.setMinRatio(cps.get(i - 1).getRatio());
+                    } else {
+                        cp.setMinRatio(cps.get(i - 1).getRatio());
+                        cp.setMaxRatio(cps.get(i + 1).getRatio());
+                    }
                 }
             }
         }
@@ -431,6 +455,10 @@ public class TransferFunctionPanel extends JPanel {
             if (i == 0) {
                 path.moveTo(xBorderGap, y - v);
                 path.lineTo(x, y - v);
+                if (this.opacityControlPoints.size() == 1) {
+                    path.lineTo(x, y - v);
+                    path.lineTo(xBorderGap + width, y - v);
+                }
             } else if (i == this.opacityControlPoints.size() - 1) {
                 path.lineTo(x, y - v);
                 path.lineTo(xBorderGap + width, y - v);
@@ -565,14 +593,16 @@ public class TransferFunctionPanel extends JPanel {
                         }
                     });
                 } else {
-                    jMenuItemControlPoint.setText("Delete control point");
-                    jMenuItemControlPoint.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent ae) {
-                            opacityControlPoints.remove(selectedPoint);
-                            TransferFunctionPanel.this.repaint();
-                        }
-                    });
+                    if (opacityControlPoints.size() > 1) {
+                        jMenuItemControlPoint.setText("Delete control point");
+                        jMenuItemControlPoint.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent ae) {
+                                opacityControlPoints.remove(selectedPoint);
+                                TransferFunctionPanel.this.repaint();
+                            }
+                        });
+                    }
                 }
                 popupMenu.add(jMenuItemControlPoint);
                 popupMenu.show(TransferFunctionPanel.this, e.getX(), e.getY());

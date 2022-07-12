@@ -94,6 +94,8 @@ public class FrmSetting extends javax.swing.JDialog {
 
         javax.swing.GroupLayout jPanel_AppearanceLayout = new javax.swing.GroupLayout(jPanel_Appearance);
         jPanel_Appearance.setLayout(jPanel_AppearanceLayout);
+        jPanel_AppearanceLayout.setAutoCreateGaps(true);
+        jPanel_AppearanceLayout.setAutoCreateContainerGaps(true);
         jPanel_AppearanceLayout.setHorizontalGroup(
             jPanel_AppearanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel_AppearanceLayout.createSequentialGroup()
@@ -154,7 +156,7 @@ public class FrmSetting extends javax.swing.JDialog {
 
         jTabbedPane1.addTab("Plot", jPanel_Plot);*/
 
-        jButton_Apply.setText("Apply");
+        jButton_Apply.setText(bundle.getString("FrmSetting.jButtonApply.text"));
         jButton_Apply.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton_ApplyActionPerformed(evt);

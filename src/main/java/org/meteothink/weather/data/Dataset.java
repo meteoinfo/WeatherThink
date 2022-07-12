@@ -19,6 +19,7 @@ import org.meteoinfo.projection.ProjectionInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class Dataset {
     private MeteoDataInfo dataInfo;
@@ -267,5 +268,180 @@ public class Dataset {
             e.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * Read 3D array from meteo data info
+     *
+     * @param varName Variable name
+     * @param xSkip X skip
+     * @param ySkip Y skip
+     * @return 3D array
+     */
+    public DimArray read3DArray(String varName, int xSkip, int ySkip) {
+        try {
+            Variable variable = dataInfo.getDataInfo().getVariable(varName);
+            List<Range> ranges = new ArrayList<>();
+            List<Dimension> dimensions = variable.getDimensions();
+            int n = dimensions.size();
+            if (n == 4) {
+                ranges.add(new Range(timeIndex, timeIndex));
+            }
+            Range range;
+            for (int i = n - 3; i < n; i++) {
+                if (i == n - 1)
+                    range = new Range(0, dimensions.get(i).getLength() - 1, xSkip);
+                else if (i == n - 2)
+                    range = new Range(0, dimensions.get(i).getLength() - 1, ySkip);
+                else
+                    range = new Range(dimensions.get(i).getLength());
+                ranges.add(range);
+            }
+            DimArray array = dataInfo.getDataInfo().readDimArray(varName, ranges);
+            if (isWRF())
+                array = WRFUtil.deStagger(array);
+
+            Dimension zDim = array.getZDimension();
+            if (zDim != null) {
+                switch (zDim.getUnit()) {
+                    case "hpa":
+                        zDim.setDimValue(MeteoMath.pressure2Height(zDim.getDimValue()));
+                        zDim.setUnit("m");
+                        break;
+                    case "pa":
+                        zDim.setDimValue(MeteoMath.pressure2Height(ArrayMath.div(zDim.getDimValue(), 100)));
+                        zDim.setUnit("m");
+                        break;
+                    case "eta":
+                        if (isWRF()) {
+                            zDim.setDimValue(WRFUtil.getGPM1D(this.dataInfo.getDataInfo()).getArray());
+                            zDim.setUnit("m");
+                        }
+                        break;
+                }
+            }
+
+            array.asAscending();
+
+            return array;
+        } catch (InvalidRangeException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Find U variable
+     * @param is3D 3D variable or not
+     * @return U variable
+     */
+    public Variable findUVariable(boolean is3D) {
+        String vName;
+        if (is3D) {
+            for (Variable variable : this.get3DVariables()) {
+                vName = variable.getName();
+                switch (vName.toLowerCase()) {
+                    case "u":
+                    case "uwnd":
+                        return variable;
+                }
+            }
+        } else {
+            for (Variable variable : this.get2DVariables()) {
+                vName = variable.getName();
+                switch (vName.toLowerCase()) {
+                    case "u":
+                    case "uwnd":
+                    case "u10":
+                    case "u2":
+                        return variable;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Find V variable
+     * @param is3D 3D variable or not
+     * @return V variable
+     */
+    public Variable findVVariable(boolean is3D) {
+        String vName;
+        if (is3D) {
+            for (Variable variable : this.get3DVariables()) {
+                vName = variable.getName();
+                switch (vName.toLowerCase()) {
+                    case "v":
+                    case "vwnd":
+                        return variable;
+                }
+            }
+        } else {
+            for (Variable variable : this.get2DVariables()) {
+                vName = variable.getName();
+                switch (vName.toLowerCase()) {
+                    case "v":
+                    case "vwnd":
+                    case "v10":
+                    case "v2":
+                        return variable;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Find W variable
+     * @return W variable
+     */
+    public Variable findWVariable() {
+        String vName;
+        for (Variable variable : this.get3DVariables()) {
+            vName = variable.getName();
+            switch (vName.toLowerCase()) {
+                case "w":
+                    return variable;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get 3D variables
+     *
+     * @return 3D variables list
+     */
+    public List<Variable> get3DVariables() {
+        List<Variable> variables = new ArrayList<>();
+        for (Variable variable : this.getVariables()) {
+            if (variable.getXDimension() != null && variable.getYDimension() != null &&
+                    variable.getZDimension() != null) {
+                variables.add(variable);
+            }
+        }
+
+        return variables;
+    }
+
+    /**
+     * Get 2D variables
+     *
+     * @return 2D variables list
+     */
+    public List<Variable> get2DVariables() {
+        List<Variable> variables = new ArrayList<>();
+        for (Variable variable : this.getVariables()) {
+            if (variable.getXDimension() != null && variable.getYDimension() != null &&
+                    variable.getZDimension() == null) {
+                variables.add(variable);
+            }
+        }
+
+        return variables;
     }
 }

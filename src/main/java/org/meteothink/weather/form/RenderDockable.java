@@ -31,7 +31,6 @@ import java.util.List;
 public class RenderDockable extends DefaultSingleCDockable {
 
     final java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("bundle/RenderDockable");
-    private JPanel jPanelLayers;
     private JScrollPane jScrollPaneLayers;
     private JCheckBoxList jCheckBoxListLayers;
     private LayerPanel layerPanel;
@@ -73,12 +72,11 @@ public class RenderDockable extends DefaultSingleCDockable {
     }
 
     private void initComponents() {
-        jPanelLayers = new JPanel();
         jScrollPaneLayers = new JScrollPane();
         jCheckBoxListLayers = new JCheckBoxList();
 
         DefaultListModel listModel = new DefaultListModel();
-        LayerType[] layerTypes = new LayerType[]{LayerType.MAP_IMAGE, LayerType.SLICE,
+        LayerType[] layerTypes = new LayerType[]{LayerType.MAP_IMAGE, LayerType.SLICE, LayerType.STREAMLINE,
                 LayerType.ISO_SURFACE, LayerType.VOLUME};
         for (LayerType layerType : layerTypes) {
             PlotLayer layer = PlotLayer.factory(layerType, colorMaps);

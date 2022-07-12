@@ -97,8 +97,8 @@ public class WeatherThink {
         }
 
         if (args.length >= 1) {
-            if (args[0].startsWith("-local:")) {
-                String locale = args[0].substring(7);
+            if (args[0].startsWith("-locale:")) {
+                String locale = args[0].substring(8);
                 switch (locale.toLowerCase()) {
                     case "eng":
                     case "en":

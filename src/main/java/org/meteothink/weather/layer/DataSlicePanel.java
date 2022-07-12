@@ -89,9 +89,9 @@ public class DataSlicePanel extends LayerPanel implements ItemListener {
         //Transfer function
         ColorMap ct = ColorUtil.findColorTable(colorMaps, "matlab_jet");
         if (this.data == null)
-            transferFunctionPanel = new TransferFunctionPanel(null, ct, colorMaps, 1.0f);
+            transferFunctionPanel = new TransferFunctionPanel(null, ct, colorMaps, 1.0f, 1);
         else
-            transferFunctionPanel = new TransferFunctionPanel(this.data.getArray(), ct, colorMaps, 1.0f);
+            transferFunctionPanel = new TransferFunctionPanel(this.data.getArray(), ct, colorMaps, 1.0f, 1);
         transferFunctionPanel.addTransferFunctionChangedListener(new TransferFunctionChangedListener() {
             @Override
             public void transferFunctionChangedEvent(TransferFunctionChangedEvent e) {
@@ -381,6 +381,7 @@ public class DataSlicePanel extends LayerPanel implements ItemListener {
                     dataset.getZArray(), xSlice, ySlice, zSlice, transferFunction);
             MeshGraphic graphic = (MeshGraphic) graphics.get(0);
             graphic.setFaceInterp(true);
+            graphic.setUsingLight(false);
             return graphic;
         } catch (InvalidRangeException e) {
             e.printStackTrace();
