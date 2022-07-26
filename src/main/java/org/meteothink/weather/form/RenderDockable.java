@@ -4,6 +4,7 @@ import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.action.CAction;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import org.meteoinfo.chart.jogl.Plot3DGL;
+import org.meteoinfo.common.Extent3D;
 import org.meteoinfo.common.colors.ColorMap;
 import org.meteoinfo.common.colors.ColorUtil;
 import org.meteoinfo.geometry.graphic.Graphic;
@@ -128,18 +129,24 @@ public class RenderDockable extends DefaultSingleCDockable {
     }
 
     private void onLayerCheckChanged(ChangeEvent e) {
+        JFrame jFrame = this.parent;
+        jFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         CheckBoxListEntry cb = (CheckBoxListEntry) e.getSource();
         PlotLayer layer = (PlotLayer) cb.getValue();
         layer.setSelected(cb.isSelected());
         layer.updateGraphic();
-        Graphic graphic = layer.getGraphic();
-        updateLayerGraphic(layer, graphic);
+        //Graphic graphic = layer.getGraphic();
+        //updateLayerGraphic(layer, graphic);
+        updateLayerGraphic();
+        jFrame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     }
 
     private void onLayerGraphicChanged(GraphicChangedEvent e) {
         PlotLayer layer = (PlotLayer) e.getSource();
         Graphic graphic = e.getGraphic();
-        updateLayerGraphic(layer, graphic);
+        //updateLayerGraphic(layer, graphic);
+        layer.setGraphic(graphic);
+        updateLayerGraphic();
     }
 
     /**
@@ -156,9 +163,42 @@ public class RenderDockable extends DefaultSingleCDockable {
         layer.setGraphic(graphic);
         if (graphic != null && layer.isSelected()) {
             this.plot3DGL.addGraphic(graphic);
+            if (dataset == null) {
+                Extent3D extent3D = this.plot3DGL.getGraphicExtent();
+                if (extent3D.getZLength() < 1e-10) {
+                    extent3D.maxZ = extent3D.minZ + 10;
+                }
+                this.plot3DGL.setDrawExtent(extent3D);
+                this.plot3DGL.setAxesExtent(extent3D);
+            }
             if (this.plot3DGL.getZMin() == this.plot3DGL.getZMax()) {
                 this.plot3DGL.setZMax(this.plot3DGL.getZMin() + 10);
             }
+        }
+        this.parent.getFigureDockable().rePaint();
+        this.parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    }
+
+    /**
+     * Update layer and graphic
+     */
+    public void updateLayerGraphic() {
+        this.parent.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+        this.plot3DGL.removeAllGraphics();
+        for (PlotLayer layer : this.layers) {
+            if (layer.isSelected() && layer.getGraphic() != null)
+                this.plot3DGL.addGraphic(layer.getGraphic());
+        }
+        if (dataset == null) {
+            Extent3D extent3D = this.plot3DGL.getGraphicExtent();
+            if (extent3D.getZLength() < 1e-10) {
+                extent3D.maxZ = extent3D.minZ + 10;
+            }
+            this.plot3DGL.setDrawExtent(extent3D);
+            this.plot3DGL.setAxesExtent(extent3D);
+        }
+        if (this.plot3DGL.getZMin() == this.plot3DGL.getZMax()) {
+            this.plot3DGL.setZMax(this.plot3DGL.getZMin() + 10);
         }
         this.parent.getFigureDockable().rePaint();
         this.parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));

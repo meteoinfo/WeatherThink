@@ -56,7 +56,7 @@ public class DataSlicePanel extends LayerPanel implements ItemListener {
     double maxData = 1;
     double minValue = 0;
     double maxValue = 1;
-    DecimalFormat decimalFormat = new DecimalFormat("#.##");
+    DecimalFormat decimalFormat = new DecimalFormat("#.##E0");
     MeshGraphic graphic;
     boolean changeMinMaxValue = true;
     boolean updateTransferFunctionPanel = true;
@@ -121,7 +121,7 @@ public class DataSlicePanel extends LayerPanel implements ItemListener {
                         jTextFieldDataValue.setText(decimalFormat.format(value));
                         jLabelOpacity.setEnabled(true);
                         jTextFieldOpacity.setEnabled(true);
-                        jTextFieldOpacity.setText(decimalFormat.format(ocp.getOpacity()));
+                        jTextFieldOpacity.setText(new DecimalFormat("#.##").format(ocp.getOpacity()));
                     }
                 }
                 updateTransferFunctionPanel = true;
@@ -141,7 +141,7 @@ public class DataSlicePanel extends LayerPanel implements ItemListener {
                     jTextFieldDataValue.setText(decimalFormat.format(value));
                     jLabelOpacity.setEnabled(true);
                     jTextFieldOpacity.setEnabled(true);
-                    jTextFieldOpacity.setText(decimalFormat.format(ocp.getOpacity()));
+                    jTextFieldOpacity.setText(new DecimalFormat("#.##").format(ocp.getOpacity()));
                 }
                 updateTransferFunctionPanel = true;
             }
@@ -475,10 +475,10 @@ public class DataSlicePanel extends LayerPanel implements ItemListener {
             if (ocp != null) {
                 float opacity = Float.parseFloat(jTextFieldOpacity.getText());
                 if (opacity < 0) {
-                    jTextFieldOpacity.setText(decimalFormat.format(0));
+                    jTextFieldOpacity.setText(new DecimalFormat("#.##").format(0));
                     return;
                 } else if (opacity > 1) {
-                    jTextFieldOpacity.setText(decimalFormat.format(1));
+                    jTextFieldOpacity.setText(new DecimalFormat("#.##").format(1));
                 }
                 ocp.setOpacity(opacity);
                 transferFunctionPanel.repaint();

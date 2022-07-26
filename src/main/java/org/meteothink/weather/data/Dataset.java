@@ -2,6 +2,7 @@ package org.meteothink.weather.data;
 
 import org.meteoinfo.common.Extent3D;
 import org.meteoinfo.data.dimarray.DimArray;
+import org.meteoinfo.data.dimarray.Dimension;
 import org.meteoinfo.data.dimarray.DimensionType;
 import org.meteoinfo.data.meteodata.MeteoDataInfo;
 import org.meteoinfo.data.meteodata.MeteoDataType;
@@ -11,21 +12,21 @@ import org.meteoinfo.data.meteodata.netcdf.NetCDFDataInfo;
 import org.meteoinfo.data.meteodata.util.WRFUtil;
 import org.meteoinfo.math.meteo.MeteoMath;
 import org.meteoinfo.ndarray.Array;
-import org.meteoinfo.data.dimarray.Dimension;
 import org.meteoinfo.ndarray.InvalidRangeException;
 import org.meteoinfo.ndarray.Range;
 import org.meteoinfo.ndarray.math.ArrayMath;
+import org.meteoinfo.ndarray.math.ArrayUtil;
 import org.meteoinfo.projection.ProjectionInfo;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class Dataset {
     private MeteoDataInfo dataInfo;
     private Array xArray;
     private Array yArray;
     private Array zArray;
+    private Array zArray3D;
     private int timeIndex = 0;
     private boolean zReverse = false;
 
@@ -65,6 +66,7 @@ public class Dataset {
             case "eta":
                 if (isWRF()) {
                     zArray = WRFUtil.getGPM1D(this.dataInfo.getDataInfo()).getArray();
+                    zArray3D = WRFUtil.getGPM(this.dataInfo.getDataInfo()).getArray();
                 }
                 break;
         }
@@ -263,6 +265,12 @@ public class Dataset {
 
             array.asAscending();
 
+            if (zArray3D != null) {
+                zArray = ArrayUtil.lineSpace(ArrayMath.min(zArray), ArrayMath.max(zArray), (int) zArray.getSize(), true);
+                Array a = ArrayUtil.interpolate_1d(zArray, zArray3D, array.getArray(), 0);
+                array.setArray(a);
+            }
+
             return array;
         } catch (InvalidRangeException e) {
             e.printStackTrace();
@@ -281,49 +289,68 @@ public class Dataset {
     public DimArray read3DArray(String varName, int xSkip, int ySkip) {
         try {
             Variable variable = dataInfo.getDataInfo().getVariable(varName);
-            List<Range> ranges = new ArrayList<>();
-            List<Dimension> dimensions = variable.getDimensions();
-            int n = dimensions.size();
-            if (n == 4) {
-                ranges.add(new Range(timeIndex, timeIndex));
-            }
-            Range range;
-            for (int i = n - 3; i < n; i++) {
-                if (i == n - 1)
-                    range = new Range(0, dimensions.get(i).getLength() - 1, xSkip);
-                else if (i == n - 2)
-                    range = new Range(0, dimensions.get(i).getLength() - 1, ySkip);
-                else
-                    range = new Range(dimensions.get(i).getLength());
-                ranges.add(range);
-            }
-            DimArray array = dataInfo.getDataInfo().readDimArray(varName, ranges);
-            if (isWRF())
-                array = WRFUtil.deStagger(array);
-
-            Dimension zDim = array.getZDimension();
-            if (zDim != null) {
-                switch (zDim.getUnit()) {
-                    case "hpa":
-                        zDim.setDimValue(MeteoMath.pressure2Height(zDim.getDimValue()));
-                        zDim.setUnit("m");
-                        break;
-                    case "pa":
-                        zDim.setDimValue(MeteoMath.pressure2Height(ArrayMath.div(zDim.getDimValue(), 100)));
-                        zDim.setUnit("m");
-                        break;
-                    case "eta":
-                        if (isWRF()) {
-                            zDim.setDimValue(WRFUtil.getGPM1D(this.dataInfo.getDataInfo()).getArray());
-                            zDim.setUnit("m");
-                        }
-                        break;
+            if (variable.getStaggerDimIndex() >= 0) {
+                DimArray array = read3DArray(varName);
+                if (array == null) {
+                    return null;
+                } else {
+                    List<Range> ranges = new ArrayList<>();
+                    List<Dimension> dimensions = array.getDimensions();
+                    Range range;
+                    int n = dimensions.size();
+                    for (int i = 0; i < n; i++) {
+                        if (i == n - 1)
+                            range = new Range(0, dimensions.get(i).getLength() - 1, xSkip);
+                        else if (i == n - 2)
+                            range = new Range(0, dimensions.get(i).getLength() - 1, ySkip);
+                        else
+                            range = new Range(dimensions.get(i).getLength());
+                        ranges.add(range);
+                    }
+                    return array.section(ranges);
                 }
+            } else {
+                List<Range> ranges = new ArrayList<>();
+                List<Dimension> dimensions = variable.getDimensions();
+                int n = dimensions.size();
+                if (n == 4) {
+                    ranges.add(0, new Range(timeIndex, timeIndex));
+                }
+                Range range;
+                for (int i = n - 3; i < n; i++) {
+                    if (i == n - 1)
+                        range = new Range(0, dimensions.get(i).getLength() - 1, xSkip);
+                    else if (i == n - 2)
+                        range = new Range(0, dimensions.get(i).getLength() - 1, ySkip);
+                    else
+                        range = new Range(dimensions.get(i).getLength());
+                    ranges.add(range);
+                }
+                DimArray array = dataInfo.getDataInfo().readDimArray(varName, ranges);
+                Dimension zDim = array.getZDimension();
+                if (zDim != null) {
+                    switch (zDim.getUnit()) {
+                        case "hpa":
+                            zDim.setDimValue(MeteoMath.pressure2Height(zDim.getDimValue()));
+                            zDim.setUnit("m");
+                            break;
+                        case "pa":
+                            zDim.setDimValue(MeteoMath.pressure2Height(ArrayMath.div(zDim.getDimValue(), 100)));
+                            zDim.setUnit("m");
+                            break;
+                        case "eta":
+                            if (isWRF()) {
+                                zDim.setDimValue(WRFUtil.getGPM1D(this.dataInfo.getDataInfo()).getArray());
+                                zDim.setUnit("m");
+                            }
+                            break;
+                    }
+                }
+
+                array.asAscending();
+
+                return array;
             }
-
-            array.asAscending();
-
-            return array;
         } catch (InvalidRangeException e) {
             e.printStackTrace();
             return null;

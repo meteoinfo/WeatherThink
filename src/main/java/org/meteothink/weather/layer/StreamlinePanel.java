@@ -2,28 +2,35 @@ package org.meteothink.weather.layer;
 
 import org.meteoinfo.chart.graphic.GraphicCollection3D;
 import org.meteoinfo.chart.graphic.GraphicFactory;
+import org.meteoinfo.chart.graphic.TriMeshGraphic;
+import org.meteoinfo.common.colors.ColorMap;
+import org.meteoinfo.common.colors.ColorUtil;
 import org.meteoinfo.data.dimarray.DimArray;
 import org.meteoinfo.data.meteodata.Variable;
 import org.meteoinfo.geo.legend.LegendManage;
+import org.meteoinfo.geometry.colors.TransferFunction;
 import org.meteoinfo.geometry.graphic.Graphic;
-import org.meteoinfo.geometry.legend.ColorBreak;
+import org.meteoinfo.geometry.legend.LegendFactory;
 import org.meteoinfo.geometry.legend.LegendScheme;
 import org.meteoinfo.geometry.legend.PolylineBreak;
 import org.meteoinfo.geometry.legend.StreamlineBreak;
 import org.meteoinfo.geometry.shape.ShapeTypes;
 import org.meteoinfo.ndarray.InvalidRangeException;
 import org.meteoinfo.ndarray.math.ArrayMath;
+import org.meteoinfo.ui.slider.RangeSlider;
 import org.meteothink.weather.data.Dataset;
+import org.meteothink.weather.event.TransferFunctionChangedEvent;
+import org.meteothink.weather.event.TransferFunctionChangedListener;
+import org.meteothink.weather.plot.OpacityControlPoint;
+import org.meteothink.weather.plot.TransferFunctionPanel;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.*;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,6 +62,18 @@ public class StreamlinePanel extends LayerPanel implements ItemListener {
     JLabel jLabelZDataScale;
     JTextField jTextFieldZDataScale;
 
+    JPanel jPanelTransferFunction;
+    JCheckBox jCheckBoxConstantColor;
+    JLabel jLabelColorView;
+    TransferFunctionPanel transferFunctionPanel;
+    JLabel jLabelDataValue;
+    JTextField jTextFieldDataValue;
+    JLabel jLabelOpacity;
+    JTextField jTextFieldOpacity;
+    RangeSlider jSliderValue;
+    JTextField jTextFieldMinValue;
+    JTextField jTextFieldMaxValue;
+
     JPanel jPanelSlice;
     JLabel jLabelSliceXYZ;
     JRadioButton jRadioButtonX;
@@ -63,17 +82,26 @@ public class StreamlinePanel extends LayerPanel implements ItemListener {
     ButtonGroup buttonGroupXYZ;
     JSlider jSliderSliceValue;
 
-    Graphic graphic;
+    GraphicCollection3D graphic;
     DimArray uArray, vArray, wArray, dataArray;
     int xSkip = 1, ySkip = 1, zDataScale=10;
+    double minData = 0;
+    double maxData = 1;
+    double minValue = 0;
+    double maxValue = 1;
+    DecimalFormat decimalFormat = new DecimalFormat("#.##E0");
 
     boolean isLoading=false;
+    boolean changeMinMaxValue = true;
+    boolean updateTransferFunctionPanel = true;
 
     /**
      * Constructor
+     * @param layer The plot layer
+     * @param colorMaps The color maps
      */
-    public StreamlinePanel(PlotLayer layer) {
-        super(layer);
+    public StreamlinePanel(PlotLayer layer, ColorMap[] colorMaps) {
+        super(layer, colorMaps);
 
         Border border = BorderFactory.createTitledBorder(bundle.getString("RenderDockable.streamlinePanel.border.title"));
         this.setBorder(border);
@@ -263,6 +291,194 @@ public class StreamlinePanel extends LayerPanel implements ItemListener {
         );
         jTabbedPane.addTab(bundle.getString("RenderDockable.streamlinePanel.jTabbedPane.jPanelVariable.title"), jPanelVariable);
 
+        //Transfer function panel
+        jPanelTransferFunction = new JPanel();
+        jPanelTransferFunction.setBorder(BorderFactory.createTitledBorder(bundle.getString("RenderDockable.streamlinePanel.jPanelTransferFunction.title")));
+
+        jCheckBoxConstantColor = new JCheckBox(bundle.getString("RenderDockable.streamlinePanel.jCheckBoxConstantColor.text"));
+        jCheckBoxConstantColor.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                JCheckBox checkBox = (JCheckBox) e.getSource();
+                if (checkBox.isSelected()) {
+                    jLabelColorView.setEnabled(true);
+                    setConstantColor(jLabelColorView.getBackground());
+                } else {
+                    jLabelColorView.setEnabled(false);
+                    onTransferFunctionChanged(null);
+                }
+            }
+        });
+        jLabelColorView = new JLabel();
+        jLabelColorView.setOpaque(true);
+        jLabelColorView.setBackground(Color.white);
+        jLabelColorView.setPreferredSize(new Dimension(50, 20));
+        jLabelColorView.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                onColorActionPerformed(e);
+            }
+        });
+        jLabelColorView.setEnabled(false);
+
+        ColorMap ct = ColorUtil.findColorTable(colorMaps, "matlab_jet");
+        if (this.dataArray == null)
+            transferFunctionPanel = new TransferFunctionPanel(null, ct, colorMaps, 1.0f, 1);
+        else
+            transferFunctionPanel = new TransferFunctionPanel(this.dataArray.getArray(), ct, colorMaps, 1.0f, 1);
+        transferFunctionPanel.addTransferFunctionChangedListener(new TransferFunctionChangedListener() {
+            @Override
+            public void transferFunctionChangedEvent(TransferFunctionChangedEvent e) {
+                onTransferFunctionChanged(e);
+            }
+        });
+        transferFunctionPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+
+                updateTransferFunctionPanel = false;
+                if (transferFunctionPanel.mouseInColorMap(e)) {
+                } else {
+                    OpacityControlPoint ocp = transferFunctionPanel.getSelectedOCP();
+                    if (ocp == null) {
+                        jLabelDataValue.setEnabled(false);
+                        jTextFieldDataValue.setText("");
+                        jTextFieldDataValue.setEnabled(false);
+                        jLabelOpacity.setEnabled(false);
+                        jTextFieldOpacity.setText("");
+                        jTextFieldOpacity.setEnabled(false);
+                    } else {
+                        jLabelDataValue.setEnabled(true);
+                        jTextFieldDataValue.setEnabled(true);
+                        double value = ocp.getValue(minValue, maxValue);
+                        jTextFieldDataValue.setText(decimalFormat.format(value));
+                        jLabelOpacity.setEnabled(true);
+                        jTextFieldOpacity.setEnabled(true);
+                        jTextFieldOpacity.setText(new DecimalFormat("#.##").format(ocp.getOpacity()));
+                    }
+                }
+                updateTransferFunctionPanel = true;
+            }
+        });
+        transferFunctionPanel.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                super.mouseDragged(e);
+
+                updateTransferFunctionPanel = false;
+                OpacityControlPoint ocp = transferFunctionPanel.getSelectedOCP();
+                if (ocp != null) {
+                    jLabelDataValue.setEnabled(true);
+                    jTextFieldDataValue.setEnabled(true);
+                    double value = ocp.getValue(minValue, maxValue);
+                    jTextFieldDataValue.setText(decimalFormat.format(value));
+                    jLabelOpacity.setEnabled(true);
+                    jTextFieldOpacity.setEnabled(true);
+                    jTextFieldOpacity.setText(new DecimalFormat("#.##").format(ocp.getOpacity()));
+                }
+                updateTransferFunctionPanel = true;
+            }
+        });
+
+        jLabelDataValue = new JLabel(bundle.getString("RenderDockable.dataValue"));
+        jTextFieldDataValue = new JTextField(5);
+        jLabelOpacity = new JLabel(bundle.getString("RenderDockable.opacity"));
+        jTextFieldOpacity = new JTextField(5);
+        jLabelDataValue.setEnabled(false);
+        jTextFieldDataValue.setEnabled(false);
+        jLabelOpacity.setEnabled(false);
+        jTextFieldOpacity.setEnabled(false);
+        jTextFieldDataValue.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                onDataValueChanged(e);
+            }
+        });
+        jTextFieldOpacity.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                onOpacityChanged(e);
+            }
+        });
+
+        jSliderValue = new RangeSlider();
+        jSliderValue.setValue(0);
+        jSliderValue.setUpperValue(100);
+        jTextFieldMinValue = new JTextField(5);
+        jTextFieldMaxValue = new JTextField(5);
+        jTextFieldMinValue.setText(decimalFormat.format(minData));
+        jTextFieldMaxValue.setText(decimalFormat.format(maxData));
+        jSliderValue.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                onSliderValueChanged(e);
+            }
+        });
+        jTextFieldMinValue.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                minValue = Double.parseDouble(jTextFieldMinValue.getText());
+                if (minValue < minData) {
+                    minValue = minData;
+                    jTextFieldMinValue.setText(decimalFormat.format(minValue));
+                }
+                double min = (minValue - minData) / (maxData - minData) * 100;
+                changeMinMaxValue = false;
+                jSliderValue.setValue((int) min);
+                changeMinMaxValue = true;
+            }
+        });
+        jTextFieldMaxValue.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                maxValue = Double.parseDouble(jTextFieldMaxValue.getText());
+                if (maxValue > maxData) {
+                    maxValue = maxData;
+                    jTextFieldMaxValue.setText(decimalFormat.format(maxValue));
+                }
+                double max = (maxValue - minData) / (maxData - minData) * 100;
+                changeMinMaxValue = false;
+                jSliderValue.setUpperValue((int) max);
+                changeMinMaxValue = true;
+            }
+        });
+
+        layout = new GroupLayout(jPanelTransferFunction);
+        jPanelTransferFunction.setLayout(layout);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        layout.setHorizontalGroup(layout.createParallelGroup()
+                .addGroup(layout.createSequentialGroup()
+                        .addComponent(jCheckBoxConstantColor)
+                        .addComponent(jLabelColorView, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addComponent(transferFunctionPanel)
+                .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabelDataValue)
+                        .addComponent(jTextFieldDataValue)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabelOpacity)
+                        .addComponent(jTextFieldOpacity))
+                .addGroup(layout.createSequentialGroup()
+                        .addComponent(jTextFieldMinValue, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jSliderValue)
+                        .addComponent(jTextFieldMaxValue, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)));
+
+        layout.setVerticalGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(jCheckBoxConstantColor)
+                        .addComponent(jLabelColorView, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addComponent(transferFunctionPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabelDataValue)
+                        .addComponent(jTextFieldDataValue)
+                        .addComponent(jLabelOpacity)
+                        .addComponent(jTextFieldOpacity))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(jTextFieldMinValue, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jSliderValue)
+                        .addComponent(jTextFieldMaxValue, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)));
+
         //Slice panel
         jPanelSlice = new JPanel();
         jPanelSlice.setBorder(BorderFactory.createTitledBorder(bundle.getString("RenderDockable.streamlinePanel.jPanelSlice.border.title")));
@@ -315,10 +531,12 @@ public class StreamlinePanel extends LayerPanel implements ItemListener {
         layout.setAutoCreateContainerGaps(true);
         layout.setHorizontalGroup(
                 layout.createParallelGroup()
+                        .addComponent(jPanelTransferFunction)
                         .addComponent(jPanelSlice)
         );
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
+                        .addComponent(jPanelTransferFunction)
                         .addComponent(jPanelSlice)
         );
         jTabbedPane.addTab(bundle.getString("RenderDockable.streamlinePanel.jTabbedPane.jPanelRendering.title"), jPanelRendering);
@@ -373,6 +591,10 @@ public class StreamlinePanel extends LayerPanel implements ItemListener {
      */
     @Override
     public Graphic getGraphic() {
+        return createGraphic(transferFunctionPanel.getTransferFunction());
+    }
+
+    private Graphic createGraphic(LegendScheme ls) {
         JFrame jFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         jFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
@@ -389,8 +611,44 @@ public class StreamlinePanel extends LayerPanel implements ItemListener {
         }
 
         try {
-            LegendScheme ls = LegendManage.createLegendScheme(ArrayMath.min(dataArray.getArray()).doubleValue(),
-                    ArrayMath.max(dataArray.getArray()).doubleValue(), 10);
+            int density = 4;
+            if (this.jRadioButtonX.isSelected() || this.jRadioButtonY.isSelected()) {
+                density = 10;
+            }
+            List graphics = GraphicFactory.streamSlice(uArray.getXDimension().getDimValue(), uArray.getYDimension().getDimValue(),
+                    uArray.getZDimension().getDimValue(), uArray.getArray(), vArray.getArray(), wArray.getArray(),
+                    dataArray.getArray(), xSlice, ySlice, zSlice, density, ls);
+            GraphicCollection3D graphic = (GraphicCollection3D) graphics.get(0);
+            graphic.setUsingLight(false);
+
+            jFrame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+
+            return graphic;
+        } catch (InvalidRangeException e) {
+            e.printStackTrace();
+            jFrame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            return null;
+        }
+    }
+
+    private Graphic createGraphic(TransferFunction transferFunction) {
+        JFrame jFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        jFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+
+        int v = this.jSliderSliceValue.getValue();
+        List<Number> xSlice = new ArrayList<>();
+        List<Number> ySlice = new ArrayList<>();
+        List<Number> zSlice = new ArrayList<>();
+        if (this.jRadioButtonX.isSelected()) {
+            xSlice.add(v / 100. * (dataset.getXMax() - dataset.getXMin()) + dataset.getXMin());
+        } else if (this.jRadioButtonY.isSelected()) {
+            ySlice.add(v / 100. * (dataset.getYMax() - dataset.getYMin()) + dataset.getYMin());
+        } else if (this.jRadioButtonZ.isSelected()) {
+            zSlice.add(v / 100. * (dataset.getZMax() - dataset.getZMin()) + dataset.getZMin());
+        }
+
+        try {
+            LegendScheme ls = transferFunction.toLegendScheme(minData, maxData, 10);
             ls = ls.convertTo(ShapeTypes.POLYLINE);
             for (int i = 0; i < ls.getBreakNum(); i++) {
                 StreamlineBreak lb = new StreamlineBreak((PolylineBreak) ls.getLegendBreak(i));
@@ -421,7 +679,7 @@ public class StreamlinePanel extends LayerPanel implements ItemListener {
     }
 
     private void updateGraphic() {
-        graphic = getGraphic();
+        graphic = (GraphicCollection3D) getGraphic();
         if (graphic != null) {
             this.layer.fileGraphicChangedEvent(graphic);
         }
@@ -462,6 +720,9 @@ public class StreamlinePanel extends LayerPanel implements ItemListener {
 
                 for (Variable variable : dataset.get3DVariables()) {
                     this.jComboBoxColorVariable.addItem(variable.getName());
+                }
+                if (u != null) {
+                    this.jComboBoxXField.setSelectedItem(u.getName());
                 }
             } else {
                 for (Variable variable : dataset.get2DVariables()) {
@@ -534,11 +795,122 @@ public class StreamlinePanel extends LayerPanel implements ItemListener {
 
     private void onColorVariableChanged(ItemEvent e) {
         if (e.getStateChange() == ItemEvent.SELECTED) {
-            String dataName = this.jComboBoxColorVariable.getSelectedItem().toString();
-            if (this.xSkip > 1 || this.ySkip > 1)
-                this.dataArray = this.dataset.read3DArray(dataName, xSkip, ySkip);
-            else
-                this.dataArray = this.dataset.read3DArray(dataName);
+            String varName = this.jComboBoxColorVariable.getSelectedItem().toString();
+            readDataArray(varName);
+        }
+    }
+
+    private void readDataArray(String varName) {
+        JFrame jFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        jFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        if (this.xSkip > 1 || this.ySkip > 1)
+            this.dataArray = this.dataset.read3DArray(varName, xSkip, ySkip);
+        else
+            this.dataArray = this.dataset.read3DArray(varName);
+        this.minData = ArrayMath.min(dataArray.getArray()).doubleValue();
+        this.maxData = ArrayMath.max(dataArray.getArray()).doubleValue();
+        this.minValue = this.minData;
+        this.maxValue = this.maxData;
+        this.jSliderValue.setValue(0);
+        this.jSliderValue.setUpperValue(100);
+        this.jTextFieldMinValue.setText(decimalFormat.format(minData));
+        this.jTextFieldMaxValue.setText(decimalFormat.format(maxData));
+        this.transferFunctionPanel.setData(dataArray.getArray());
+        graphic = (GraphicCollection3D) createGraphic(this.transferFunctionPanel.getTransferFunction());
+        if (graphic != null) {
+            this.layer.fileGraphicChangedEvent(graphic);
+        }
+        jFrame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+    }
+
+    private void onTransferFunctionChanged(TransferFunctionChangedEvent e) {
+        if (this.dataset != null) {
+            if (this.dataArray == null) {
+                String varName = (String) this.jComboBoxColorVariable.getSelectedItem();
+                readDataArray(varName);
+            }
+
+            TransferFunction transferFunction = this.transferFunctionPanel.getTransferFunction();
+            if (graphic == null) {
+                graphic = (GraphicCollection3D) createGraphic(transferFunction);
+            }
+            else {
+                LegendScheme ls = transferFunction.toLegendScheme(minData, maxData, 10);
+                ls = ls.convertTo(ShapeTypes.POLYLINE);
+                for (int i = 0; i < ls.getBreakNum(); i++) {
+                    StreamlineBreak lb = new StreamlineBreak((PolylineBreak) ls.getLegendBreak(i));
+                    lb.setInterval(30);
+                    //lb.setWidth(1.5f);
+                    lb.setArrowHeadLength(2.5f);
+                    lb.setArrowHeadWidth(1.0f);
+                    ls.setLegendBreak(i, lb);
+                }
+                graphic.setLegendScheme(ls);
+            }
+            if (graphic != null) {
+                this.layer.fileGraphicChangedEvent(graphic);
+            }
+        }
+    }
+
+    private void setConstantColor(Color color) {
+        this.jLabelColorView.setBackground(color);
+        LegendScheme ls = LegendFactory.createSingleSymbolLegendScheme(ShapeTypes.POLYLINE, color, 1);
+        StreamlineBreak lb = new StreamlineBreak((PolylineBreak) ls.getLegendBreak(0));
+        lb.setInterval(30);
+        //lb.setWidth(1.5f);
+        lb.setArrowHeadLength(2.5f);
+        lb.setArrowHeadWidth(1.0f);
+        ls.setLegendBreak(0, lb);
+        if (graphic == null)
+            graphic = (GraphicCollection3D) createGraphic(ls);
+        else
+            graphic.setLegendScheme(ls);
+        if (graphic != null) {
+            this.layer.fileGraphicChangedEvent(graphic);
+        }
+    }
+
+    private void onColorActionPerformed(MouseEvent e) {
+        JLabel label = (JLabel) e.getSource();
+        Color color = JColorChooser.showDialog(this.getRootPane().getParent(), "选择颜色", label.getBackground());
+        if (color != null) {
+            setConstantColor(color);
+        }
+    }
+
+    private void onDataValueChanged(ActionEvent e) {
+        if (updateTransferFunctionPanel) {
+            OpacityControlPoint ocp = transferFunctionPanel.getSelectedOCP();
+            if (ocp != null) {
+                double v = Double.parseDouble(jTextFieldDataValue.getText());
+                float ratio = (float) ((v - minValue) / (maxValue - minValue));
+                if (v < ocp.getMinRatio()) {
+                    jTextFieldDataValue.setText(decimalFormat.format(ratio));
+                    return;
+                }
+                ocp.setRatio(ratio);
+                transferFunctionPanel.repaint();
+                transferFunctionPanel.fileTransferFunctionChangedEvent();
+            }
+        }
+    }
+
+    private void onOpacityChanged(ActionEvent e) {
+        if (updateTransferFunctionPanel) {
+            OpacityControlPoint ocp = transferFunctionPanel.getSelectedOCP();
+            if (ocp != null) {
+                float opacity = Float.parseFloat(jTextFieldOpacity.getText());
+                if (opacity < 0) {
+                    jTextFieldOpacity.setText(new DecimalFormat("#.##").format(0));
+                    return;
+                } else if (opacity > 1) {
+                    jTextFieldOpacity.setText(new DecimalFormat("#.##").format(1));
+                }
+                ocp.setOpacity(opacity);
+                transferFunctionPanel.repaint();
+                transferFunctionPanel.fileTransferFunctionChangedEvent();
+            }
         }
     }
 
@@ -555,9 +927,33 @@ public class StreamlinePanel extends LayerPanel implements ItemListener {
         }
     }
 
+    private void setMinMaxValue() {
+        transferFunctionPanel.setMinValue(minValue);
+        transferFunctionPanel.setMaxValue(maxValue);
+        OpacityControlPoint ocp = transferFunctionPanel.getSelectedOCP();
+        if (ocp != null) {
+            updateTransferFunctionPanel = false;
+            this.jTextFieldDataValue.setText(decimalFormat.format(ocp.getValue(minValue, maxValue)));
+            updateTransferFunctionPanel = true;
+        }
+    }
+
+    private void onSliderValueChanged(ChangeEvent e) {
+        if (changeMinMaxValue) {
+            int min = jSliderValue.getValue();
+            int max = jSliderValue.getUpperValue();
+            minValue = min * (maxData - minData) / 100 + minData;
+            maxValue = max * (maxData - minData) / 100 + minData;
+            jTextFieldMinValue.setText(decimalFormat.format(minValue));
+            jTextFieldMaxValue.setText(decimalFormat.format(maxValue));
+        }
+
+        setMinMaxValue();
+    }
+
     private void onLocationSliderValueChanged(ChangeEvent e) {
         //TransferFunction transferFunction = this.transferFunctionPanel.getTransferFunction();
-        graphic = getGraphic();
+        graphic = (GraphicCollection3D) getGraphic();
         if (graphic != null) {
             this.layer.fileGraphicChangedEvent(graphic);
         }

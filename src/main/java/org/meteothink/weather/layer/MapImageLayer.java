@@ -29,18 +29,4 @@ public class MapImageLayer extends PlotLayer {
             this.graphic = this.configPanel.getGraphic();
         }
     }
-
-    protected void loadMapImage() {
-        String startPath = System.getProperty("user.dir");
-        String fileName = startPath + File.separator + "data/map/world_topo.jpg";
-        try {
-            ImageLayer layer = (ImageLayer) MapDataManage.loadLayer(fileName);
-            this.graphic = GraphicFactory.geoSurface(layer, 0, 0, 360, 180);
-            ((GraphicCollection3D)this.graphic).setUsingLight(false);
-            TextureShape shape = (TextureShape) ((GraphicCollection3D)this.graphic).get(0).getShape();
-            shape.setXRepeat(2);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }

@@ -38,7 +38,7 @@ public class IsoSurfacePanel extends LayerPanel {
     DimArray data;
     double minValue = 0;
     double maxValue = 1;
-    DecimalFormat decimalFormat = new DecimalFormat("#.##");
+    DecimalFormat decimalFormat = new DecimalFormat("#.##E0");
     TriMeshGraphic graphic;
     boolean updateTransferFunctionPanel = true;
 
@@ -259,7 +259,7 @@ public class IsoSurfacePanel extends LayerPanel {
                 String varName = (String) this.jComboBoxVariable.getSelectedItem();
                 readDataArray(varName);
                 float mean = (float) ArrayMath.mean(data.getArray());
-                this.jTextFieldValue.setText(String.valueOf(mean));
+                this.jTextFieldValue.setText(decimalFormat.format(mean));
             }
         }
     }

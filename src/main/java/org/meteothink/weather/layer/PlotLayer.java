@@ -40,7 +40,7 @@ public abstract class PlotLayer {
             case VOLUME:
                 return new VolumeLayer(colorMaps);
             case STREAMLINE:
-                return new StreamlineLayer();
+                return new StreamlineLayer(colorMaps);
             case WIND_VECTOR:
                 return new WindVectorLayer();
             default:

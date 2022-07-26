@@ -86,6 +86,7 @@ public class TransferFunctionPanel extends JPanel {
     public TransferFunctionPanel(Array data, ColorMap colorMap, ColorMap[] colorMaps, Float opacity, int opacityCPNumber) {
         super();
         this.setPreferredSize(new Dimension(200, 120));
+        initComponents();
 
         if (colorMaps != null) {
             setColorMaps(colorMaps);
@@ -175,6 +176,7 @@ public class TransferFunctionPanel extends JPanel {
     public TransferFunctionPanel (Array data, float opacity) {
         super();
         this.setPreferredSize(new Dimension(200, 120));
+        initComponents();
 
         this.isoValue = true;
         this.drawColorControlPoints = true;
@@ -233,6 +235,12 @@ public class TransferFunctionPanel extends JPanel {
         });
     }
 
+    private void initComponents() {
+        this.jComboBoxColorMap = new JComboBox();
+        this.add(jComboBoxColorMap, BorderLayout.SOUTH);
+        this.jComboBoxColorMap.setVisible(false);
+    }
+
     public void addTransferFunctionChangedListener(TransferFunctionChangedListener listener) {
         this.listeners.add(TransferFunctionChangedListener.class, listener);
     }
@@ -264,6 +272,7 @@ public class TransferFunctionPanel extends JPanel {
             this.histogram = ArrayUtil.histogram(data, 256).get(0);
             this.histogram = ArrayUtil.toFloat(this.histogram);
             this.histogram = ArrayMath.div(this.histogram, ArrayMath.max(this.histogram));
+            this.repaint();
         }
     }
 
@@ -309,10 +318,6 @@ public class TransferFunctionPanel extends JPanel {
      */
     public void setColorMaps(ColorMap[] value) {
         this.colorMaps = value;
-        if (this.jComboBoxColorMap == null) {
-            this.jComboBoxColorMap = new JComboBox();
-            this.add(jComboBoxColorMap);
-        }
 
         ColorListCellRender render = new ColorListCellRender();
         render.setPreferredSize(new Dimension(62, 21));
@@ -559,7 +564,9 @@ public class TransferFunctionPanel extends JPanel {
                     jComboBoxColorMap.setLocation(this.getX(), this.getY() +
                             this.getHeight() - 20);
                     jComboBoxColorMap.setSize(this.getWidth(), 20);
+                    jComboBoxColorMap.setVisible(true);
                     jComboBoxColorMap.showPopup();
+                    jComboBoxColorMap.setVisible(false);
                 }
             } else if (mouseInHistogram(e)) {
                 JPopupMenu popupMenu = new JPopupMenu();
