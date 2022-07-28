@@ -30,7 +30,7 @@ public class FrmAbout extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         this.setTitle(bundle.getString("FrmAbout.title"));
-        this.jLabel_version.setText("0.2");
+        this.jLabel_version.setText("0.2.1");
         this.jLabel_web.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }
 
