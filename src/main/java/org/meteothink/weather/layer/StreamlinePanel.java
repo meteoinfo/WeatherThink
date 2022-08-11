@@ -845,7 +845,7 @@ public class StreamlinePanel extends LayerPanel implements ItemListener {
                     lb.setArrowHeadWidth(1.0f);
                     ls.setLegendBreak(i, lb);
                 }
-                graphic.setLegendScheme(ls);
+                graphic.updateLegendScheme(ls);
             }
             if (graphic != null) {
                 this.layer.fileGraphicChangedEvent(graphic);
@@ -865,7 +865,7 @@ public class StreamlinePanel extends LayerPanel implements ItemListener {
         if (graphic == null)
             graphic = (GraphicCollection3D) createGraphic(ls);
         else
-            graphic.setLegendScheme(ls);
+            graphic.updateLegendScheme(ls);
         if (graphic != null) {
             this.layer.fileGraphicChangedEvent(graphic);
         }

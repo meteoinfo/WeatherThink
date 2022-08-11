@@ -462,6 +462,13 @@ public class VolumePanel extends LayerPanel {
         if (changeMinMaxValue) {
             int min = jSliderValue.getValue();
             int max = jSliderValue.getUpperValue();
+            if (min == max) {
+                if (max < 100) {
+                    max += 1;
+                } else {
+                    min -= 1;
+                }
+            }
             minValue = min * (maxData - minData) / 100 + minData;
             maxValue = max * (maxData - minData) / 100 + minData;
             jTextFieldMinValue.setText(decimalFormat.format(minValue));

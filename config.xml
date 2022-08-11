@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <MeteoInfo File="config.xml" Type="configurefile">
-  <Path OpenPath="D:\Temp\nc\wrf"/>
+  <Path OpenPath="D:\Temp\LaSW\data"/>
   <LookFeel LafDecorated="true" Name="FlatDarkLaf"/>
   <Figure DoubleBuffering="true"/>
   <Startup MainFormLocation="-7,-7" MainFormSize="1293,685"/>

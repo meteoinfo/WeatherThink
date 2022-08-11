@@ -40,6 +40,7 @@ public class FrmMain extends JFrame {
     private JComboBox jComboBoxTimes;
 
     private RenderDockable renderDockable;
+    private SceneDockable sceneDockable;
     private FigureDockable figureDockable;
 
     private JPanel jPanelStatus;
@@ -100,7 +101,7 @@ public class FrmMain extends JFrame {
         System.out.println("Editor and Console panels...");
         CGrid grid = new CGrid(control);
 
-        figureDockable = new FigureDockable(this, this.startupPath, bundle.getString("FrmMain.figureDockable.title"));
+        figureDockable = new FigureDockable(this, "Figure", bundle.getString("FrmMain.figureDockable.title"));
         figureDockable.buttonFullExtent.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -110,7 +111,9 @@ public class FrmMain extends JFrame {
                 }
             }
         });
-        renderDockable = new RenderDockable(this, "Configure", this.startupPath);
+        renderDockable = new RenderDockable(this, "Configure", bundle.getString("FrmMain.renderDockable.title"));
+        sceneDockable = new SceneDockable(this, "Scene", bundle.getString("FrmMain.sceneDockable.title"));
+        grid.add(0, 0, 3, 10, sceneDockable);
         grid.add(0, 0, 3, 10, renderDockable);
         grid.add(3, 0, 7, 10, figureDockable);
         control.getContentArea().deploy(grid);
@@ -283,6 +286,7 @@ public class FrmMain extends JFrame {
         this.figureDockable.getPlot().setFixExtent(true);
         if (this.renderDockable != null)
             this.renderDockable.setDataset(dataset);
+        this.jLabelInstitute.setText(new File(dataset.getDataInfo().getFileName()).getName());
 
         this.jComboBoxTimes.setVisible(true);
         DateTimeFormatter sdf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");

@@ -266,9 +266,11 @@ public class Dataset {
             array.asAscending();
 
             if (zArray3D != null) {
-                zArray = ArrayUtil.lineSpace(ArrayMath.min(zArray), ArrayMath.max(zArray), (int) zArray.getSize(), true);
-                Array a = ArrayUtil.interpolate_1d(zArray, zArray3D, array.getArray(), 0);
-                array.setArray(a);
+                if (array.getSize() == zArray3D.getSize()) {
+                    zArray = ArrayUtil.lineSpace(ArrayMath.min(zArray3D), ArrayMath.max(zArray3D), (int) zArray.getSize(), true);
+                    Array a = ArrayUtil.interpolate_1d(zArray, zArray3D, array.getArray(), 0);
+                    array.setArray(a);
+                }
             }
 
             return array;

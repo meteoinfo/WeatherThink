@@ -74,7 +74,7 @@ public class FigureDockable extends DefaultSingleCDockable {
         });
         this.addAction(button);
         this.addSeparator();
-        //Zoom in action
+        /*//Zoom in action
         button = new CButton();
         button.setText("Zoom In");
         button.setIcon(new FlatSVGIcon("icons/zoom-in.svg"));
@@ -111,7 +111,7 @@ public class FigureDockable extends DefaultSingleCDockable {
                 chartPanel.setMouseMode(MouseMode.PAN);
             }
         });
-        this.addAction(button);
+        this.addAction(button);*/
         //Rotate action
         button = new CButton();
         button.setText("Rotate");
@@ -139,7 +139,7 @@ public class FigureDockable extends DefaultSingleCDockable {
         });*/
         this.addAction(buttonFullExtent);
         this.addSeparator();
-        //Identifer action
+        /*//Identifer action
         button = new CButton();
         button.setText("Identifer");
         //button.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/information.png")));
@@ -152,7 +152,7 @@ public class FigureDockable extends DefaultSingleCDockable {
             }
         });
         this.addAction(button);
-        this.addSeparator();
+        this.addSeparator();*/
     }
 
     /**
@@ -162,6 +162,14 @@ public class FigureDockable extends DefaultSingleCDockable {
     public void setDoubleBuffer(boolean doubleBuffer) {
         this.doubleBuffer = doubleBuffer;
         this.chartPanel.setDoubleBuffered(doubleBuffer);
+    }
+
+    /**
+     * Set chart panel
+     * @return Chart panel
+     */
+    public GLChartPanel getChartPanel() {
+        return this.chartPanel;
     }
 
     /**

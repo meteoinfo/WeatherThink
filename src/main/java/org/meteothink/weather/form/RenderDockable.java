@@ -39,7 +39,6 @@ public class RenderDockable extends DefaultSingleCDockable {
 
     private FrmMain parent;
     private Plot3DGL plot3DGL;
-    private String startPath;
     private ColorMap[] colorMaps;
 
     private List<PlotLayer> layers = new ArrayList<>();
@@ -52,14 +51,13 @@ public class RenderDockable extends DefaultSingleCDockable {
         initComponents();
     }
 
-    public RenderDockable(final FrmMain parent, String s, String startPath, CAction... cActions) {
-        super(s, cActions);
+    public RenderDockable(final FrmMain parent, String s, String title, CAction... cActions) {
+        super(s, title, cActions);
 
         this.parent = parent;
         this.plot3DGL = parent.getFigureDockable().getPlot();
-        this.startPath = startPath;
 
-        this.setTitleIcon(new FlatSVGIcon("icons/setting.svg"));
+        this.setTitleIcon(new FlatSVGIcon("icons/layers.svg"));
 
         String path = System.getProperty("user.dir");
         path = path + File.separator + "data" + File.separator + "colormaps";
@@ -144,9 +142,9 @@ public class RenderDockable extends DefaultSingleCDockable {
     private void onLayerGraphicChanged(GraphicChangedEvent e) {
         PlotLayer layer = (PlotLayer) e.getSource();
         Graphic graphic = e.getGraphic();
-        //updateLayerGraphic(layer, graphic);
+        updateLayerGraphic(layer, graphic);
         layer.setGraphic(graphic);
-        updateLayerGraphic();
+        //updateLayerGraphic();
     }
 
     /**
@@ -219,7 +217,7 @@ public class RenderDockable extends DefaultSingleCDockable {
         }
 
         this.dataset = dataset;
-        this.setTitleText(new File(dataset.getDataInfo().getFileName()).getName());
+        //this.setTitleText(new File(dataset.getDataInfo().getFileName()).getName());
         if (this.layerPanel != null) {
             this.layerPanel.setDataset(dataset);
             this.layerPanel.updateUI();

@@ -379,6 +379,9 @@ public class DataSlicePanel extends LayerPanel implements ItemListener {
         try {
             List graphics = GraphicFactory.slice(data.getArray(), dataset.getXArray(), dataset.getYArray(),
                     dataset.getZArray(), xSlice, ySlice, zSlice, transferFunction);
+            if (graphics.isEmpty())
+                return null;
+
             MeshGraphic graphic = (MeshGraphic) graphics.get(0);
             graphic.setFaceInterp(true);
             graphic.setUsingLight(false);
