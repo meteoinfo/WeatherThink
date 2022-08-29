@@ -152,7 +152,8 @@ public class SceneDockable extends DefaultSingleCDockable {
         Color color = JColorChooser.showDialog(parent, bundle_commons.getString("Commons.selectColor"), label.getBackground());
         if (color != null) {
             label.setBackground(color);
-            plot3DGL.setBackground(color);
+            //plot3DGL.setBackground(color);
+            parent.getFigureDockable().getChartPanel().getChart().setBackground(color);
             parent.getFigureDockable().rePaint();
         }
     }
