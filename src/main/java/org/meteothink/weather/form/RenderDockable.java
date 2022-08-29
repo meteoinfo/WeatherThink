@@ -3,7 +3,7 @@ package org.meteothink.weather.form;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.action.CAction;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
-import org.meteoinfo.chart.jogl.Plot3DGL;
+import org.meteoinfo.chart.jogl.MapGLPlot;
 import org.meteoinfo.common.Extent3D;
 import org.meteoinfo.common.colors.ColorMap;
 import org.meteoinfo.common.colors.ColorUtil;
@@ -38,7 +38,7 @@ public class RenderDockable extends DefaultSingleCDockable {
     private JScrollPane jScrollPaneConfig;
 
     private FrmMain parent;
-    private Plot3DGL plot3DGL;
+    private MapGLPlot plot3DGL;
     private ColorMap[] colorMaps;
 
     private List<PlotLayer> layers = new ArrayList<>();

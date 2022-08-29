@@ -10,10 +10,10 @@ import bibliothek.gui.dock.common.action.CAction;
 import bibliothek.gui.dock.common.action.CButton;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import org.meteoinfo.chart.AspectType;
+import org.meteoinfo.chart.GLChart;
+import org.meteoinfo.chart.GLChartPanel;
 import org.meteoinfo.chart.MouseMode;
-import org.meteoinfo.chart.jogl.GLChartPanel;
-import org.meteoinfo.chart.jogl.MapPlot3D;
-import org.meteoinfo.chart.jogl.Plot3DGL;
+import org.meteoinfo.chart.jogl.MapGLPlot;
 import org.meteoinfo.chart.plot.GridLine;
 
 import java.awt.*;
@@ -37,8 +37,9 @@ public class FigureDockable extends DefaultSingleCDockable {
         this.parent = parent;
         this.doubleBuffer = true;
         this.setTitleIcon(new FlatSVGIcon("icons/figure_3d.svg"));
-        chartPanel = new GLChartPanel();
-        Plot3DGL plot3DGL = new MapPlot3D();
+        chartPanel = new GLChartPanel(new GLChart());
+        MapGLPlot plot3DGL = new MapGLPlot();
+        plot3DGL.setPosition(0, 0, 1, 1);
         plot3DGL.setAspectType(AspectType.XY_EQUAL);
         plot3DGL.setClipPlane(false);
         plot3DGL.setOrthographic(false);
@@ -55,7 +56,9 @@ public class FigureDockable extends DefaultSingleCDockable {
         plot3DGL.getLighting().setEnable(true);
         plot3DGL.setAxesZoom(true);
         plot3DGL.setZScale(0.5f);
-        chartPanel.setPlot(plot3DGL);
+        chartPanel.getChart().setBackground(Color.black);
+        chartPanel.getChart().addPlot(plot3DGL);
+        chartPanel.setMouseMode(MouseMode.ROTATE);
         //chartPanel.setZoomXY(true);
         this.getContentPane().add(chartPanel);
         //this.setCloseable(false);
@@ -176,8 +179,8 @@ public class FigureDockable extends DefaultSingleCDockable {
      * Get plot 3D object
      * @return Plot 3D object
      */
-    public Plot3DGL getPlot() {
-        return this.chartPanel.getPlot();
+    public MapGLPlot getPlot() {
+        return (MapGLPlot) this.chartPanel.getChart().getPlot();
     }
 
     /**

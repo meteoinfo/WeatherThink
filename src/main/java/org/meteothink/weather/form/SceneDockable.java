@@ -3,9 +3,7 @@ package org.meteothink.weather.form;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.action.CAction;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
-import org.meteoinfo.chart.graphic.TriMeshGraphic;
-import org.meteoinfo.chart.jogl.GLChartPanel;
-import org.meteoinfo.chart.jogl.Plot3DGL;
+import org.meteoinfo.chart.jogl.MapGLPlot;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -20,7 +18,7 @@ import java.util.ResourceBundle;
 public class SceneDockable extends DefaultSingleCDockable {
 
     private FrmMain parent;
-    private Plot3DGL plot3DGL;
+    private MapGLPlot plot3DGL;
 
     final ResourceBundle bundle = ResourceBundle.getBundle("bundle/SceneDockable");
     final ResourceBundle bundle_commons = ResourceBundle.getBundle("bundle/Commons");
