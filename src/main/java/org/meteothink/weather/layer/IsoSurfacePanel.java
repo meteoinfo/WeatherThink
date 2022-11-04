@@ -5,7 +5,10 @@ import org.meteoinfo.chart.graphic.TriMeshGraphic;
 import org.meteoinfo.data.dimarray.DimArray;
 import org.meteoinfo.data.meteodata.Variable;
 import org.meteoinfo.geometry.graphic.Graphic;
+import org.meteoinfo.geometry.legend.LegendScheme;
+import org.meteoinfo.geometry.legend.LegendType;
 import org.meteoinfo.geometry.legend.PolygonBreak;
+import org.meteoinfo.geometry.shape.ShapeTypes;
 import org.meteoinfo.ndarray.math.ArrayMath;
 import org.meteothink.weather.data.Dataset;
 import org.meteothink.weather.event.TransferFunctionChangedEvent;
@@ -244,12 +247,15 @@ public class IsoSurfacePanel extends LayerPanel {
         PolygonBreak pb = new PolygonBreak();
         pb.setColor(color);
         pb.setDrawOutline(false);
+        LegendScheme ls = new LegendScheme(ShapeTypes.POLYGON);
+        ls.addLegendBreak(pb);
+        ls.setLegendType(LegendType.SINGLE_SYMBOL);
 
         if (data == null) {
             data = this.dataset.read3DArray(varName);
         }
         graphic = GraphicFactory.isosurface(data.getArray(), data.getXDimension().getDimValue(),
-                data.getYDimension().getDimValue(), data.getZDimension().getDimValue(), value, pb, 4);
+                data.getYDimension().getDimValue(), data.getZDimension().getDimValue(), value, ls, 4);
         return graphic;
     }
 
