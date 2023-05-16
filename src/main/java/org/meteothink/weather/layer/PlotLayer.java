@@ -36,7 +36,7 @@ public abstract class PlotLayer {
             case SLICE:
                 return new DataSliceLayer(colorMaps);
             case ISO_SURFACE:
-                return new IsoSurfaceLayer();
+                return new IsoSurfaceLayer(colorMaps);
             case VOLUME:
                 return new VolumeLayer(colorMaps);
             case STREAMLINE:

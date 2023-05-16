@@ -11,18 +11,19 @@
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <meteoinfo.version>3.6-SNAPSHOT</meteoinfo.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.meteothink</groupId>
             <artifactId>meteoinfo-chart</artifactId>
-            <version>3.5-SNAPSHOT</version>
+            <version>${meteoinfo.version}</version>
         </dependency>
         <dependency>
             <groupId>org.meteothink</groupId>
             <artifactId>meteoinfo-console</artifactId>
-            <version>3.5-SNAPSHOT</version>
+            <version>${meteoinfo.version}</version>
         </dependency>
         <dependency>
             <groupId>de.sciss</groupId>

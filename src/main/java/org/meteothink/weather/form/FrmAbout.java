@@ -30,7 +30,7 @@ public class FrmAbout extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         this.setTitle(bundle.getString("FrmAbout.title"));
-        this.jLabel_version.setText("0.3");
+        this.jLabel_version.setText("0.4");
         this.jLabel_web.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }
 
@@ -62,28 +62,22 @@ public class FrmAbout extends javax.swing.JDialog {
 
         jLabelIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/wt_logo.jpg"))); // NOI18N
 
-        //jLabel2.setFont(new java.awt.Font("Courier", 1, 18)); // NOI18N
         jLabelName.setText(bundle.getString("FrmAbout.jLabelName.text"));
 
-        //jLabel3.setFont(new java.awt.Font("Courier", 0, 14)); // NOI18N
         jLabelLongName.setText(bundle.getString("FrmAbout.jLabelLongName.text"));
 
-        //jLabel4.setFont(new java.awt.Font("Courier", 1, 15)); // NOI18N
         jLabelVersion.setText(bundle.getString("FrmAbout.jLabelVersion.text"));
 
-        //jLabel5.setFont(new java.awt.Font("Courier", 1, 15)); // NOI18N
         jLabelAuthor.setText(bundle.getString("FrmAbout.jLabelAuthor.text"));
 
         jLabelAuthorName.setText(bundle.getString("FrmAbout.jLabelAuthorName.text"));
 
         jLabel_version.setText("...");
 
-        //jLabel8.setFont(new java.awt.Font("Courier", 1, 15)); // NOI18N
         jLabelSponsor.setText(bundle.getString("FrmAbout.jLabelSponsor.text"));
 
         jLabelSponsorName.setText(bundle.getString("FrmAbout.jLabelSponsorName.text"));
 
-        //jLabel10.setFont(new java.awt.Font("Courier", 1, 15)); // NOI18N
         jLabelHomepage.setText(bundle.getString("FrmAbout.jLabelHomepage.text"));
 
         jLabel_web.setForeground(new java.awt.Color(0, 153, 204));

@@ -678,8 +678,6 @@ public class TransferFunctionPanel extends JPanel {
 
         Normalize normalize = new Normalize(minValue, maxValue, true);
 
-        TransferFunction transferFunction = new TransferFunction(opacityTransferFunction, this.colorMap, normalize);
-
-        return transferFunction;
+        return new TransferFunction(opacityTransferFunction, this.colorMap, normalize);
     }
 }

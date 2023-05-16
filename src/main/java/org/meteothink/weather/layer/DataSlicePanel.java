@@ -7,7 +7,6 @@ import org.meteoinfo.common.colors.ColorUtil;
 import org.meteoinfo.data.dimarray.DimArray;
 import org.meteoinfo.data.meteodata.Variable;
 import org.meteoinfo.geo.legend.LegendManage;
-import org.meteoinfo.geometry.colors.Normalize;
 import org.meteoinfo.geometry.colors.TransferFunction;
 import org.meteoinfo.geometry.graphic.Graphic;
 import org.meteoinfo.geometry.legend.LegendScheme;
@@ -324,10 +323,6 @@ public class DataSlicePanel extends LayerPanel implements ItemListener {
         }
         double vMin = ArrayMath.min(data.getArray()).doubleValue();
         double vMax = ArrayMath.max(data.getArray()).doubleValue();
-        Normalize normalize = new Normalize(vMin, vMax, true);
-        List<Number> opacityLevels = new ArrayList<>();
-        opacityLevels.add(0.0f);
-        opacityLevels.add(1.0f);
         LegendScheme ls = LegendManage.createLegendScheme(vMin, vMax, colorMap);
         ls = ls.convertTo(ShapeTypes.POLYGON);
         int v = this.jSliderSliceValue.getValue();
@@ -343,9 +338,9 @@ public class DataSlicePanel extends LayerPanel implements ItemListener {
         }
 
         try {
-            List graphics = GraphicFactory.slice(data.getArray(), dataset.getXArray(), dataset.getYArray(),
+            List<MeshGraphic> graphics = GraphicFactory.slice(data.getArray(), dataset.getXArray(), dataset.getYArray(),
                     dataset.getZArray(), xSlice, ySlice, zSlice, ls);
-            MeshGraphic graphic = (MeshGraphic) graphics.get(0);
+            MeshGraphic graphic = graphics.get(0);
             graphic.setFaceInterp(true);
             return graphic;
         } catch (InvalidRangeException e) {
@@ -377,12 +372,12 @@ public class DataSlicePanel extends LayerPanel implements ItemListener {
         }
 
         try {
-            List graphics = GraphicFactory.slice(data.getArray(), dataset.getXArray(), dataset.getYArray(),
+            List<MeshGraphic> graphics = GraphicFactory.slice(data.getArray(), dataset.getXArray(), dataset.getYArray(),
                     dataset.getZArray(), xSlice, ySlice, zSlice, transferFunction);
             if (graphics.isEmpty())
                 return null;
 
-            MeshGraphic graphic = (MeshGraphic) graphics.get(0);
+            MeshGraphic graphic = graphics.get(0);
             graphic.setFaceInterp(true);
             graphic.setUsingLight(false);
             return graphic;

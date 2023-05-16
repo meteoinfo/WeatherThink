@@ -71,7 +71,7 @@ public abstract class LayerPanel extends JPanel {
     /**
      * Get 3D variables
      *
-     * @return
+     * @return 3D variables
      */
     public List<Variable> get3DVariables() {
         List<Variable> variables = new ArrayList<>();

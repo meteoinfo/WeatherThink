@@ -28,6 +28,8 @@ public class SceneDockable extends DefaultSingleCDockable {
     private ButtonGroup buttonGroupProjections;
     private JRadioButton jRadioButtonPerspective;
     private JRadioButton jRadioButtonOrthographic;
+    private JLabel jLabelFieldOfView;
+    private JSpinner jSpinnerFieldOfView;
     private JLabel jLabelZScale;
     private JSpinner jSpinnerZScale;
     private JCheckBox jCheckBoxClipPlane;
@@ -63,7 +65,15 @@ public class SceneDockable extends DefaultSingleCDockable {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (e.getSource() instanceof JRadioButton) {
-                    plot3DGL.setOrthographic(jRadioButtonOrthographic.isSelected());
+                    boolean isOrthographic = jRadioButtonOrthographic.isSelected();
+                    plot3DGL.setOrthographic(isOrthographic);
+                    if (isOrthographic) {
+                        jLabelFieldOfView.setVisible(false);
+                        jSpinnerFieldOfView.setVisible(false);
+                    } else {
+                        jLabelFieldOfView.setVisible(true);
+                        jSpinnerFieldOfView.setVisible(true);
+                    }
                     parent.getFigureDockable().rePaint();
                 }
             }
@@ -77,9 +87,19 @@ public class SceneDockable extends DefaultSingleCDockable {
         jRadioButtonOrthographic.addActionListener(actionListener);
         buttonGroupProjections.add(jRadioButtonPerspective);
         buttonGroupProjections.add(jRadioButtonOrthographic);
+        jLabelFieldOfView = new JLabel(bundle.getString("SceneDockable.jLabelFieldOfView.text"));
+        SpinnerModel spinnerModelFOV = new SpinnerNumberModel(plot3DGL.getFieldOfView(), 10.f, 90.f, 5.0f);
+        jSpinnerFieldOfView = new JSpinner(spinnerModelFOV);
+        jSpinnerFieldOfView.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                plot3DGL.setFieldOfView(((Number) jSpinnerFieldOfView.getValue()).floatValue());
+                parent.getFigureDockable().rePaint();
+            }
+        });
 
         jLabelZScale = new JLabel(bundle.getString("SceneDockable.jLabelZScale.text"));
-        SpinnerModel spinnerModel = new SpinnerNumberModel(0.5f, 0.1f, 5.0f, 0.1f);
+        SpinnerModel spinnerModel = new SpinnerNumberModel(plot3DGL.getZScale(), 0.1f, 5.0f, 0.1f);
         jSpinnerZScale = new JSpinner(spinnerModel);
         jSpinnerZScale.addChangeListener(new ChangeListener() {
             @Override
@@ -123,7 +143,10 @@ public class SceneDockable extends DefaultSingleCDockable {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabelProjections)
                                 .addComponent(jRadioButtonPerspective)
-                                .addComponent(jRadioButtonOrthographic))
+                                .addComponent(jRadioButtonOrthographic)
+                                .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jLabelFieldOfView)
+                                        .addComponent(jSpinnerFieldOfView)))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabelZScale)
                                 .addComponent(jSpinnerZScale)
@@ -137,7 +160,10 @@ public class SceneDockable extends DefaultSingleCDockable {
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(jLabelProjections)
                                 .addComponent(jRadioButtonPerspective)
-                                .addComponent(jRadioButtonOrthographic))
+                                .addComponent(jRadioButtonOrthographic)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabelFieldOfView)
+                                        .addComponent(jSpinnerFieldOfView)))
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(jLabelZScale)
                                 .addComponent(jSpinnerZScale)

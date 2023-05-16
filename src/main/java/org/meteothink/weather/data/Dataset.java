@@ -51,6 +51,11 @@ public class Dataset {
             }
         }
         xArray = dimX.getDimValue();
+        if (dataInfo.getProjectionInfo().isLonLat()) {
+            if (ArrayMath.min(xArray).doubleValue() >= 0 && ArrayMath.max(xArray).doubleValue() > 180) {
+                dataInfo.getProjectionInfo().getCoordinateReferenceSystem().getProjection().setProjectionLongitudeDegrees(180);
+            }
+        }
         yArray = dimY.getDimValue();
         if (dimY.isDescending()) {
             yArray = yArray.flip(0).copy();

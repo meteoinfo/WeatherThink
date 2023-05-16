@@ -56,6 +56,7 @@ public class FigureDockable extends DefaultSingleCDockable {
         plot3DGL.getLighting().setEnable(true);
         plot3DGL.setAxesZoom(true);
         plot3DGL.setZScale(0.5f);
+        plot3DGL.setFieldOfView(60.f);
         chartPanel.getChart().setBackground(Color.black);
         chartPanel.getChart().addPlot(plot3DGL);
         chartPanel.setMouseMode(MouseMode.ROTATE);

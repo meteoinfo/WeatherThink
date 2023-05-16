@@ -1,12 +1,14 @@
 package org.meteothink.weather.layer;
 
+import org.meteoinfo.common.colors.ColorMap;
+
 public class IsoSurfaceLayer extends PlotLayer {
 
     /**
      * Constructor
      */
-    public IsoSurfaceLayer() {
-        this.configPanel = new IsoSurfacePanel(this);
+    public IsoSurfaceLayer(ColorMap[] colorMaps) {
+        this.configPanel = new IsoSurfacePanel(this, colorMaps);
     }
 
     @Override
