@@ -2,6 +2,10 @@ package org.meteothink.weather.layer;
 
 import org.meteoinfo.chart.graphic.GraphicFactory;
 import org.meteoinfo.chart.graphic.MeshGraphic;
+import org.meteoinfo.chart.ui.OpacityControlPoint;
+import org.meteoinfo.chart.ui.TransferFunctionChangedEvent;
+import org.meteoinfo.chart.ui.TransferFunctionChangedListener;
+import org.meteoinfo.chart.ui.TransferFunctionPanel;
 import org.meteoinfo.common.colors.ColorMap;
 import org.meteoinfo.common.colors.ColorUtil;
 import org.meteoinfo.data.dimarray.DimArray;
@@ -15,10 +19,6 @@ import org.meteoinfo.ndarray.InvalidRangeException;
 import org.meteoinfo.ndarray.math.ArrayMath;
 import org.meteoinfo.ui.slider.RangeSlider;
 import org.meteothink.weather.data.Dataset;
-import org.meteothink.weather.event.TransferFunctionChangedEvent;
-import org.meteothink.weather.event.TransferFunctionChangedListener;
-import org.meteothink.weather.plot.OpacityControlPoint;
-import org.meteothink.weather.plot.TransferFunctionPanel;
 
 import javax.swing.*;
 import javax.swing.border.Border;

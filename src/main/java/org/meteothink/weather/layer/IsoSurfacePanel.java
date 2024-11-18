@@ -2,11 +2,11 @@ package org.meteothink.weather.layer;
 
 import org.meteoinfo.chart.graphic.GraphicFactory;
 import org.meteoinfo.chart.graphic.TriMeshGraphic;
+import org.meteoinfo.chart.ui.*;
 import org.meteoinfo.common.colors.ColorMap;
 import org.meteoinfo.common.colors.ColorUtil;
 import org.meteoinfo.data.dimarray.DimArray;
 import org.meteoinfo.data.meteodata.Variable;
-import org.meteoinfo.geo.legend.LegendManage;
 import org.meteoinfo.geometry.colors.TransferFunction;
 import org.meteoinfo.geometry.graphic.Graphic;
 import org.meteoinfo.geometry.legend.LegendScheme;
@@ -16,11 +16,6 @@ import org.meteoinfo.geometry.shape.ShapeTypes;
 import org.meteoinfo.ndarray.math.ArrayMath;
 import org.meteoinfo.ui.slider.RangeSlider;
 import org.meteothink.weather.data.Dataset;
-import org.meteothink.weather.event.TransferFunctionChangedEvent;
-import org.meteothink.weather.event.TransferFunctionChangedListener;
-import org.meteothink.weather.plot.ControlPoint;
-import org.meteothink.weather.plot.OpacityControlPoint;
-import org.meteothink.weather.plot.TransferFunctionPanel;
 
 import javax.swing.*;
 import javax.swing.border.Border;

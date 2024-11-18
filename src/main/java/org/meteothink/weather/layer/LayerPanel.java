@@ -1,7 +1,6 @@
 package org.meteothink.weather.layer;
 
 import org.meteoinfo.common.colors.ColorMap;
-import org.meteoinfo.data.meteodata.MeteoDataInfo;
 import org.meteoinfo.data.meteodata.Variable;
 import org.meteoinfo.geometry.graphic.Graphic;
 import org.meteothink.weather.data.Dataset;

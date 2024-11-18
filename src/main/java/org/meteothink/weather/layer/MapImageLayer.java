@@ -1,6 +1,6 @@
 package org.meteothink.weather.layer;
 
-import org.meteoinfo.chart.graphic.GraphicCollection3D;
+import org.meteoinfo.geometry.graphic.GraphicCollection3D;
 import org.meteoinfo.chart.graphic.GraphicFactory;
 import org.meteoinfo.chart.jogl.JOGLUtil;
 import org.meteoinfo.chart.shape.TextureShape;

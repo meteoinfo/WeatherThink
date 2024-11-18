@@ -90,7 +90,8 @@ public class MapImagePanel extends LayerPanel {
             if (this.dataset != null) {
                 projInfo = this.dataset.getProjInfo();
             }
-            this.graphic = GraphicFactory.geoSurface(layer, 0, 0, 360, 180, projInfo);
+            this.graphic = GraphicFactory.geoSurface(layer.getImage(), layer.getExtent(), 0,
+                    0, 360, 180, projInfo);
             if (!projInfo.isLonLat()) {
                 graphic = (MeshGraphic) GraphicProjectionUtil.projectClipGraphic(graphic, ProjectionInfo.LONG_LAT, projInfo);
             }

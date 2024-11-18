@@ -6,18 +6,18 @@
 
     <groupId>org.meteothink</groupId>
     <artifactId>WeatherThink</artifactId>
-    <version>0.3</version>
+    <version>0.4</version>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <meteoinfo.version>3.6-SNAPSHOT</meteoinfo.version>
+        <meteoinfo.version>3.8</meteoinfo.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.meteothink</groupId>
-            <artifactId>meteoinfo-chart</artifactId>
+            <artifactId>meteoinfo-geo</artifactId>
             <version>${meteoinfo.version}</version>
         </dependency>
         <dependency>
